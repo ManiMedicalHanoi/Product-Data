@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMH Dental Product Concept Hub</title>
+<style>
+:root{
+  --navy:#003047;--blue:#3A5CAA;--yellow:#FFE100;--lb1:#C2D4F1;--lb2:#CADFEE;
+  --lb3:#CFE2F3;--gray:#F5F5F5;--pale:#F0F7FF;--link:#1155CC;--darknavy:#0E2F5F;
+  --ink:#1a2b3c;--muted:#6b7c8f;--line:#e4eaf1;--white:#fff;
+  --shadow:0 1px 3px rgba(14,47,95,.06),0 8px 24px rgba(14,47,95,.07);
+  --shadow-lg:0 4px 12px rgba(14,47,95,.10),0 24px 48px rgba(14,47,95,.13);
+  --green:#2f9e5e;--orange:#e07b39;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Aptos','Lexend','Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#f7faff,#eef3fb);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--navy);color:#fff;display:flex;align-items:center;gap:16px;padding:0 24px;height:64px;box-shadow:0 2px 16px rgba(0,48,71,.25)}
+.brand{display:flex;align-items:center;gap:13px;font-weight:700}
+.brand .mark{width:38px;height:38px;border-radius:10px;background:var(--yellow);color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:18px;flex-shrink:0;box-shadow:0 2px 8px rgba(255,225,0,.35)}
+.brand .txt{display:flex;flex-direction:column;line-height:1.1}
+.brand .txt b{font-size:16px}
+.brand .txt span{font-size:10.5px;color:var(--lb1);font-weight:500;letter-spacing:.5px;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.searchbox{position:relative;display:flex;align-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:0 14px;height:40px;min-width:300px;transition:.2s}
+.searchbox:focus-within{background:rgba(255,255,255,.18);border-color:var(--yellow)}
+.searchbox svg{width:17px;height:17px;opacity:.7;flex-shrink:0}
+.searchbox input{background:none;border:none;outline:none;color:#fff;font-size:14px;padding:0 10px;width:100%;font-family:inherit}
+.searchbox input::placeholder{color:rgba(255,255,255,.55)}
+.icon-btn{width:40px;height:40px;border-radius:11px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:grid;place-items:center;transition:.15s;flex-shrink:0}
+.icon-btn:hover{background:rgba(255,255,255,.2);border-color:var(--yellow)}
+.icon-btn svg{width:18px;height:18px}
+.icon-btn.spinning svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-add{display:flex;align-items:center;gap:7px;background:var(--yellow);color:var(--navy);border:none;border-radius:11px;height:40px;padding:0 18px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.18s;white-space:nowrap}
+.btn-add:hover{filter:brightness(1.05);transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,225,0,.4)}
+.btn-add svg{width:16px;height:16px}
+/* CONNECTION STATUS */
+.conn-bar{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 24px;background:#fff;border-bottom:1px solid var(--line);color:var(--muted)}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:#c2c9d4;flex-shrink:0}
+.conn-dot.on{background:var(--green);box-shadow:0 0 0 3px rgba(47,158,94,.18)}
+.conn-dot.off{background:#e05858;box-shadow:0 0 0 3px rgba(224,88,88,.18)}
+.conn-dot.loading{background:var(--yellow);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.conn-bar .src{font-weight:600;color:var(--ink)}
+.conn-bar a{color:var(--link);text-decoration:none;font-weight:600}
+.conn-bar .spacer{flex:1}
+/* LAYOUT */
+.layout{display:flex;max-width:1540px;margin:0 auto}
+.sidebar{width:248px;flex-shrink:0;padding:26px 14px 40px 22px;position:sticky;top:104px;height:calc(100vh - 104px);overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:5px}
+.sidebar::-webkit-scrollbar-thumb{background:#cfdcef;border-radius:4px}
+.side-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:6px 8px 12px}
+.filter-item{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--ink);margin-bottom:2px;transition:.15s;user-select:none}
+.filter-item:hover{background:var(--lb2)}
+.filter-item.active{background:var(--blue);color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(58,92,170,.3)}
+.filter-item .count{font-size:11px;font-weight:700;background:rgba(0,48,71,.08);color:var(--muted);border-radius:20px;padding:1px 9px;min-width:24px;text-align:center}
+.filter-item.active .count{background:rgba(255,255,255,.25);color:#fff}
+.main{flex:1;padding:26px 28px 80px;min-width:0}
+.stats{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.stat{background:#fff;border-radius:14px;padding:15px 20px;flex:1;min-width:140px;box-shadow:var(--shadow);border:1px solid var(--line);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--yellow)}
+.stat .n{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
+.stat .l{font-size:12px;color:var(--muted);margin-top:5px;font-weight:500}
+.viewhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+.viewhead h1{font-size:21px;font-weight:800;color:var(--navy)}
+.viewhead .sub{font-size:13px;color:var(--muted);margin-top:2px}
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+.card{background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);border:1px solid var(--line);transition:.22s cubic-bezier(.3,.8,.4,1);display:flex;flex-direction:column;position:relative}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--lb1)}
+.card-photo-wrap{perspective:900px;height:152px;background:linear-gradient(135deg,var(--lb2),var(--lb1))}
+.card .photo{height:100%;position:relative;display:grid;place-items:center;overflow:hidden;transform-style:preserve-3d;transition:transform .15s ease-out}
+.card .photo img{width:100%;height:100%;object-fit:cover}
+.card .photo .glare{position:absolute;inset:0;opacity:0;transition:opacity .15s;pointer-events:none;mix-blend-mode:overlay}
+.card .photo .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--blue);opacity:.5}
+.card .photo .ph svg{width:40px;height:40px}
+.card .photo .ph span{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.card .grouptag{position:absolute;top:11px;left:11px;background:rgba(0,48,71,.82);color:#fff;backdrop-filter:blur(4px);font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:20px}
+.card .mediachips{position:absolute;bottom:10px;right:10px;display:flex;gap:5px}
+.card .mchip{width:24px;height:24px;border-radius:7px;background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.card .mchip svg{width:13px;height:13px;color:var(--blue)}
+.card .body{padding:15px 17px 17px;display:flex;flex-direction:column;flex:1}
+.card .pname{font-size:15.5px;font-weight:700;color:var(--navy);line-height:1.25;margin-bottom:4px}
+.card .ptype{font-size:11.5px;color:var(--muted);margin-bottom:11px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .tagline{margin-top:auto;background:linear-gradient(90deg,var(--pale),#fff);border-left:3px solid var(--yellow);border-radius:0 8px 8px 0;padding:8px 11px;font-size:12.5px;font-weight:600;color:var(--blue);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.empty{text-align:center;padding:80px 20px;color:var(--muted)}
+.empty svg{width:54px;height:54px;opacity:.3;margin-bottom:14px}
+.skeleton{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--line);height:300px}
+.skeleton .sk-img{height:152px;background:linear-gradient(90deg,#eef3fb,#dde7f5,#eef3fb);background-size:200% 100%;animation:shimmer 1.4s infinite}
+.skeleton .sk-body{padding:16px;display:flex;flex-direction:column;gap:10px}
+.skeleton .sk-line{height:12px;border-radius:6px;background:linear-gradient(90deg,#eef3fb,#dde7f5,#eef3fb);background-size:200% 100%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(10,28,48,.55);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:36px 20px;overflow-y:auto}
+.overlay.open{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:860px;box-shadow:0 24px 80px rgba(0,20,50,.4);overflow:hidden;animation:rise .28s cubic-bezier(.2,.8,.3,1);margin:auto 0}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hero{position:relative;height:200px;background:linear-gradient(135deg,var(--navy),var(--blue));display:flex;align-items:flex-end;overflow:hidden;perspective:1000px}
+.modal-hero .heroimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.92}
+.modal-hero .heroph{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.25)}
+.modal-hero .heroph svg{width:64px;height:64px}
+.modal-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,rgba(0,30,55,.8))}
+.modal-hero .hero-txt{position:relative;z-index:2;padding:20px 28px;color:#fff;width:100%}
+.modal-hero .htag{display:inline-block;background:var(--yellow);color:var(--navy);font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;margin-bottom:9px}
+.modal-hero h2{font-size:24px;font-weight:800;line-height:1.15;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.modal-close{position:absolute;top:14px;right:14px;z-index:5;width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;background:rgba(255,255,255,.9);color:var(--navy);display:grid;place-items:center;transition:.15s}
+.modal-close:hover{background:#fff;transform:rotate(90deg)}
+.modal-close svg{width:18px;height:18px}
+.modal-edit-btn{position:absolute;top:14px;right:60px;z-index:5;height:36px;display:flex;align-items:center;gap:6px;padding:0 14px;border-radius:20px;border:none;cursor:pointer;background:var(--yellow);color:var(--navy);font-weight:700;font-size:12.5px;font-family:inherit;transition:.15s}
+.modal-edit-btn:hover{filter:brightness(1.05)}
+.modal-edit-btn svg{width:14px;height:14px}
+/* TABS */
+.modal-tabs{display:flex;gap:4px;padding:0 28px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:6;overflow-x:auto}
+.mtab{padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s;display:flex;align-items:center;gap:7px}
+.mtab:hover{color:var(--blue)}
+.mtab.active{color:var(--blue);border-bottom-color:var(--yellow)}
+.mtab svg{width:15px;height:15px}
+.mtab .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.modal-body{padding:24px 28px 30px;max-height:calc(100vh - 360px);overflow-y:auto}
+.modal-body::-webkit-scrollbar{width:7px}
+.modal-body::-webkit-scrollbar-thumb{background:#d4ddec;border-radius:5px}
+.tab-pane{display:none;animation:fade .25s}
+.tab-pane.active{display:block}
+.tagline-big{background:linear-gradient(90deg,#fffbe0,#fff);border:1px solid #ffe97a;border-left:5px solid var(--yellow);border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px}
+.tagline-big .lbl{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a88c00;margin-bottom:3px}
+.tagline-big .val{font-size:18px;font-weight:800;color:var(--navy)}
+.sec{margin-bottom:22px}
+.sec-h{display:flex;align-items:center;gap:9px;margin-bottom:11px;font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.6px}
+.sec-h .ic{width:26px;height:26px;border-radius:8px;background:var(--lb3);display:grid;place-items:center;flex-shrink:0}
+.sec-h .ic svg{width:15px;height:15px;color:var(--blue)}
+.sec p{font-size:14px;color:var(--ink);line-height:1.6}
+.blist{list-style:none;display:flex;flex-direction:column;gap:8px}
+.blist li{display:flex;gap:10px;font-size:13.5px;line-height:1.55;color:var(--ink);background:var(--pale);padding:10px 13px;border-radius:10px}
+.blist li::before{content:'';width:7px;height:7px;border-radius:2px;background:var(--blue);margin-top:7px;flex-shrink:0;transform:rotate(45deg)}
+.blist.fab li{background:#f0fbf4;border-left:3px solid var(--green)}
+.blist.fab li::before{background:var(--green)}
+.blist.app li{background:#f4f8ff}
+.usp-box{background:linear-gradient(135deg,var(--lb1),var(--lb2));border-radius:13px;padding:16px 18px;font-size:14.5px;font-weight:600;color:var(--navy);line-height:1.55}
+.concept-box{background:var(--gray);border-radius:12px;padding:15px 17px;font-size:14px;line-height:1.65;color:var(--ink);font-style:italic}
+/* MEDIA TAB */
+.media-grid{display:flex;flex-direction:column;gap:18px}
+.media-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.media-card .mc-head{display:flex;align-items:center;gap:11px;padding:12px 16px;background:#fafcff;border-bottom:1px solid var(--line)}
+.media-card .mc-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0}
+.media-card .mc-ico svg{width:18px;height:18px;color:#fff}
+.mc-ico.pdf{background:#c0392b}.mc-ico.img{background:var(--blue)}.mc-ico.vid{background:#7c3aed}.mc-ico.ppt{background:var(--orange)}.mc-ico.doc{background:#1d4ed8}
+.media-card .mc-title{flex:1}
+.media-card .mc-title b{font-size:13.5px;color:var(--navy);display:block}
+.media-card .mc-title small{font-size:11px;color:var(--muted)}
+.media-card .mc-actions{display:flex;gap:6px}
+.mc-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--muted);transition:.15s;text-decoration:none}
+.mc-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--pale)}
+.mc-btn svg{width:15px;height:15px}
+.media-frame{width:100%;background:var(--gray);border:0;display:block}
+.media-frame.pdf,.media-frame.ppt,.media-frame.doc{height:480px}
+.media-frame.vid{aspect-ratio:16/9;height:auto}
+.media-img{width:100%;max-height:520px;object-fit:contain;background:#0d1b2a;display:block;cursor:zoom-in}
+.no-media{text-align:center;padding:50px 20px;color:var(--muted)}
+.no-media svg{width:46px;height:46px;opacity:.3;margin-bottom:12px}
+.src-grid{display:flex;flex-direction:column;gap:9px}
+/* EDIT FORM */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 13px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;transition:.15s;background:#fbfcfe;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(58,92,170,.12)}
+.field .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.field-row{display:flex;gap:14px}
+.field-row .field{flex:1}
+.form-group-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin:22px 0 12px;padding-bottom:7px;border-bottom:2px solid var(--yellow)}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:16px 28px;border-top:1px solid var(--line);background:#fafcff}
+.btn{border:none;border-radius:10px;padding:10px 22px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.15s;display:flex;align-items:center;gap:7px}
+.btn svg{width:16px;height:16px}
+.btn-ghost{background:#fff;color:var(--muted);border:1.5px solid var(--line)}
+.btn-ghost:hover{background:var(--gray);color:var(--ink)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#2f4d96;box-shadow:0 6px 16px rgba(58,92,170,.35)}
+.btn-primary:disabled{opacity:.6;cursor:wait}
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(5,12,22,.92);z-index:400;display:none;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
+.lightbox.open{display:flex;animation:fade .2s}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:13px 24px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:500;box-shadow:0 12px 32px rgba(0,30,55,.4);display:flex;align-items:center;gap:10px;opacity:0;transition:.3s cubic-bezier(.2,.9,.3,1);max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast svg{width:18px;height:18px;color:var(--yellow);flex-shrink:0}
+.toast.err svg{color:#ff8a8a}
+@media(max-width:980px){.sidebar{display:none}.searchbox{min-width:auto;width:150px}.brand .txt span{display:none}}
+@media(max-width:560px){.topbar{padding:0 14px;gap:10px}.btn-add span{display:none}.btn-add{padding:0 12px}.main{padding:18px 14px 60px}.grid{grid-template-columns:1fr}.field-row{flex-direction:column;gap:0}.modal-hero h2{font-size:20px}.conn-bar{padding:6px 14px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="mark">M</div><div class="txt"><b>MMH Dental</b><span>Product Concept Hub</span></div></div>
+  <div class="spacer"></div>
+  <div class="searchbox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" type="text" placeholder="Tìm sản phẩm, công nghệ, ứng dụng…">
+  </div>
+  <button class="icon-btn" id="refreshBtn" title="Tải lại dữ liệu từ Google Sheet" onclick="loadData(true)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>
+  </button>
+  <button class="btn-add" onclick="openEdit(null)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span>Thêm</span>
+  </button>
+</div>
+
+<div class="conn-bar">
+  <span class="conn-dot loading" id="connDot"></span>
+  <span id="connText">Đang kết nối Google Sheet…</span>
+  <span class="spacer"></span>
+  <span id="connMeta"></span>
+</div>
+
+<div class="layout">
+  <aside class="sidebar"><div class="side-title">Nhóm sản phẩm</div><div id="filters"></div></aside>
+  <main class="main">
+    <div class="stats" id="stats"></div>
+    <div class="viewhead"><div><h1 id="viewTitle">Tất cả sản phẩm</h1><div class="sub" id="viewSub"></div></div></div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()"><div class="modal" id="detailModal"></div></div>
+<div class="overlay" id="editOverlay" onclick="if(event.target===this)closeEdit()"><div class="modal" id="editModal" style="max-width:700px"></div></div>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" src=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CẤU HÌNH — chỉ cần sửa API_URL nếu deploy lại Apps Script
+   ============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbxH-EoEvrR46I5TYdCmF8OiWy8JVH6udnOKMk8JEBH9UvMVZ5ltIIgXw21IqOWaJ1y_Og/exec";
+const USE_LIVE = true;   // true = đọc/ghi từ Google Sheet; false = chỉ dùng data nhúng (offline)
+
+/* Data nhúng để app vẫn xem được khi chưa kết nối / mở offline */
+const FALLBACK = [{"stt": "1", "group": "Nội nha — Trâm máy NiTi", "name": "JIZAI (cả bộ trâm máy NiTi)\n— Orifice Opener / Glider / 020-04\n— Tạo hình I, II, III", "type": "Hệ trâm máy NiTi xử lý nhiệt — tạo đường trượt & tạo hình ống tủy", "features": ["Hợp kim NiTi xử lý nhiệt (siêu đàn hồi & ghi nhớ hình dạng)", "Phần lõi 55–60% (khối kim loại còn lại sau khi tạo rãnh cắt)", "Thiết diện tam giác có vùng đệm giúp giảm lực xoắn vặn lên trâm khi xoay (screw-in)", "Bộ tạo hình 3 trâm: I #25/.04, II #25/.06, III #35/.04"], "applications": ["Mở ống tủy - tạo lối vào thẳng", "Tạo đường trượt", "Tạo hình ống tủy thẳng & cong"], "fab": ["ĐƠN GIẢN → cả bộ chỉ cần 3 trâm tạo hình (I, II, III) cho hầu hết ca, thay vì 6–10 trâm như nhiều hệ thống khác", "AN TOÀN → hợp kim NiTi xử lý nhiệt cho kháng mỏi (chịu nhiều vòng uốn cong lặp lại trước khi gãy) thuộc nhóm cao", "LINH HOẠT → phần lõi 55–60% giúp trâm bám đường cong tự nhiên của ống tủy, không nắn thẳng ống tủy cong"], "usp": "Tạo hình ống tủy chỉ với 3 trâm — hợp kim NiTi xử lý nhiệt kháng mỏi cao, thiết diệt độc đáo giúp trâm khi xoay bám theo đường cong giải phẫu của ống tủy", "conceptLong": "Trâm máy Jizai với vật liệu Niti R Phase độc quyền và thiết diện lệch tâm độc đáo, mang lại sự an toàn và linh hoạt khi xoay trong ống tủy", "tagline": "Đơn giản – An toàn – Linh hoạt", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "2", "group": "Nội nha — Trâm tay thăm dò", "name": "D Finders", "type": "Trâm tay thép không gỉ — thăm dò ống tủy", "features": ["Thép không gỉ Ni-Cr, bề mặt hoàn thiện gương", "Thiết diện chữ D, cạnh cắt tối giản", "Cỡ #08–#15, độ thuôn .02; mô-men uốn cao hơn K-File cùng cỡ (Cứng hơn)"], "applications": ["Thăm dò ống tủy", "Xác định chiều dài làm việc", "Bước khởi đầu mọi ca; ống tủy vôi hoá nhẹ–trung bình & cong"], "fab": ["Cạnh cắt tối giản giúp trâm trượt dọc thành ống tủy thay vì \"cắn\" vào thành → giảm rõ nguy cơ tạo khấc & thủng thành", "Mô-men uốn cao + bề mặt tráng gương → bác sĩ \"đọc\" được đường đi của ống tủy chắc tay hơn"], "usp": "Thiết kế tối giản cạnh cắt để trượt thăm dò theo thành ống tủy, giảm nguy cơ tạo khấc và thủng thành", "conceptLong": "Trâm tay thăm dò ống tủy - cứng cáp & hạn chế tạo khấc", "tagline": "Thăm dò hiệu quả & Không tạo khấc", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "3", "group": "Nội nha — Trâm tay thăm dò", "name": "Glide Finders", "type": "Trâm tay thép không gỉ — cắt xuyên ống tủy vôi hoá", "features": ["Thép không gỉ mài bọc gương", "Thiết diện kép: đầu vuông (khoẻ) + thân chữ nhật (linh hoạt), có cạnh cắt thực sự", "Độ thuôn biến thiên .03 (đầu) / .02 (thân), cỡ #08–#15"], "applications": ["Cắt xuyên ống tủy vôi hoá nặng / co thắt nghiêm trọng", "Dùng tiếp ngay sau D Finders (kỹ thuật 8–10)"], "fab": ["Đầu vuông cho lực cắt khoẻ qua đoạn vôi hoá; thân chữ nhật linh hoạt bám theo cong ống tủy", "Có cạnh cắt thực sự (khác D Finders) → cắt xuyên được đoạn mà D Finders không tiến qua"], "usp": "Có cạnh cắt thực sự, đầu khoẻ để cắt qua đoạn vôi hoá — dùng ngay sau D Finders trong ống tủy khó", "conceptLong": "Trâm tay tạo đường trượt - độ thuôn biến thiên cân bằng giữa hiệu suất cắt và tính linh hoạt", "tagline": "Tạo đường trượt an toàn và linh hoạt", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "4", "group": "Nội nha — Trâm tay thăm dò", "name": "RT Files", "type": "Trâm tay thép — thiết diện chữ nhật, hiệu suất cắt cao", "features": ["Thép không gỉ, thiết diện chữ nhật (cạnh cắt 85°, góc cắt 71° — sắc hơn trâm vuông 45°)", "Phần đất (phần phẳng không cắt) chỉ 0,60–0,80 so với 1,00 của trâm vuông → linh hoạt hơn", "Cỡ #15–#80"], "applications": ["Mở rộng ống tủy cong bằng tay", "Dùng khi không có / không dùng trâm máy NiTi"], "fab": ["Là trâm thép: uốn cong sẵn theo cong ống tủy thì GIỮ NGUYÊN hình đó, đi đúng giải phẫu (khác trâm NiTi siêu đàn hồi luôn bật thẳng nên cắt thừa mặt cong ngoài)", "Góc cắt 71° + không gian làm việc rộng hơn→ cắt sâu hơn K-File (3,1–3,9mm vs 2,1–2,7mm) và linh hoạt hơn"], "usp": "Trâm thép giữ nguyên hình sau khi uốn cong — cắt sâu hơn K-File nhờ góc lưỡi 71° và linh hoạt hơn", "conceptLong": "Linh hoạt vượt trội với thiết diện hình chữ nhật, phù hợp với các ông tủy cong, hẹp hoặc vôi hóa", "tagline": "Linh hoạt vượt trội", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "5", "group": "Nội nha — Trâm tay cơ bản", "name": "Trâm tay cơ bản — REGULAR SIZE\n— K-Files\n— H-Files\n— Reamers", "type": "Trâm tay thép không gỉ — bộ tạo hình thủ công, cỡ chuẩn ISO (#06–#140)", "features": ["CÔNG NGHỆ LÕI: thép không gỉ Ni-Cr, mài bọc bề mặt nhẵn gương (giảm ma sát & bám mảnh vụn ngà), kháng ăn mòn qua mọi chu trình tiệt khuẩn", "Phân biệt theo thiết diện cắt ngang: Reamers (vuông) → K-Files (tam giác/vuông) → H-Files (giọt nước)", "Cỡ chuẩn ISO #06–#140, độ thuôn .02"], "applications": ["Tạo hình ống tủy thủ công ở mọi giai đoạn", "Phối hợp khi không dùng trâm máy NiTi"], "fab": ["Cùng nền công nghệ lõi thép mài bọc gương, ba loại bổ trợ nhau theo hiệu suất cắt tăng dần: Reamers (cắt nhẹ, cảm nhận đường đi) → K-Files (đa dụng) → H-Files (cắt khoẻ nhất khi kéo theo trục)", "Bề mặt gương + thép kháng ăn mòn → thao tác mượt, dùng bền qua nhiều ca"], "usp": "Ba loại bổ trợ nhau theo hiệu suất cắt tăng dần; bề mặt mài gương giảm ma sát, dùng bền qua nhiều lần tiệt khuẩn", "conceptLong": "Bền – Mượt – Đa dụng", "tagline": "Bền – Mượt – Đa dụng", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "6", "group": "Nội nha — Trâm tay cơ bản", "name": "Trâm tay cơ bản — MEDIUM SIZE\n— Medium Files / Medium Reamers", "type": "Trâm tay thép không gỉ — bộ cỡ trung gian (#12, #17, #22, #27, #32, #37)", "features": ["CÔNG NGHỆ LÕI: cùng thép không gỉ Ni-Cr mài bọc gương như dòng Regular", "Cỡ TRUNG GIAN chèn giữa các bước cỡ chuẩn ISO: #12, #17, #22, #27, #32, #37", "Dài 21 & 25mm"], "applications": ["Chuyển tiếp êm trong ống tủy cong / khó", "Dùng xen kẽ dòng Regular để giảm rủi ro cong, gãy trâm cỡ nhỏ"], "fab": ["Giữa các cỡ file nhỏ, đường kính tăng rất nhanh (tăng 50% khi từ #10 lên #15) tạo \"bước nhảy\" lớn khiến trâm nhỏ dễ cong & gãy trong ống tủy cong", "Cỡ trung gian chèn vào giữa → giảm bước nhảy còn ~20–25% → chuyển tiếp êm & an toàn hơn"], "usp": "Chèn giữa các cỡ file tiêu chuẩn để giảm bước nhảy đường kính, hạn chế gãy trâm cỡ nhỏ trong ống tủy cong", "conceptLong": "Chuyển tiếp êm ái & an toàn hơn với trâm medium size", "tagline": "Chuyển cỡ êm ái – Giảm nguy cơ gãy trâm", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "7", "group": "Nội nha — Phụ trợ", "name": "Paste Carriers (Lentulo)", "type": "Trâm xoắn — đưa sealer / thuốc sát khuẩn", "features": ["Thép không gỉ, phần xoắn gắn liền cán", "Cỡ #25–#40, độ thuôn .02, tốc độ ≤800 v/p"], "applications": ["Đưa sealer khi trám bít ống tủy", "Đưa thuốc sát khuẩn giữa các lần hẹn"], "fab": ["Phần xoắn gắn liền cán giúp giảm gãy"], "usp": "Xoắn gắn liền cán giúp giảm gãy trong lúc vận hành — bơm sealer và chất sát khuẩn vào ống tủy đều và đúng chiều sâu", "conceptLong": "Đưa thuốc & sealer trám bít đều, sâu vào ống tủy", "tagline": "Bền bỉ - hiệu suất cao với trâm xoắn đưa thuốc Mani Lentulo", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "8", "group": "Nội nha — Phụ trợ", "name": "Broaches (trâm gai & trâm trơn)", "type": "Dụng cụ buồng tủy — thép không gỉ", "features": ["Thép không gỉ", "Trâm trơn: thiết diện vuông, bề mặt gương", "Trâm gai: có ngạnh; cỡ 000–3, dài 52mm"], "applications": ["Lấy mô tủy", "Làm sạch & thấm khô buồng tủy", "Đưa thuốc, thăm dò lỗ vào"], "fab": ["Trâm trơn để thấm khô & đưa thuốc; trâm gai để móc và lấy mô tủy + mảnh vụn ra khỏi ống tủy", "Bộ đôi cơ bản cho thao tác buồng tủy"], "usp": "Trâm gai lấy mô tủy và mảnh vụn; trâm trơn thấm khô và đưa thuốc — bộ đôi cơ bản cho thao tác buồng tủy", "conceptLong": "Trâm gai lấy mô tủy và mảnh vụn mùn ngà; trâm trơn thấm khô và đưa thuốc", "tagline": "Dọn sạch & thấm khô buồng tủy", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "9", "group": "Mũi khoan", "name": "DIA-BURS®", "type": "Mũi khoan kim cương mài mòn — đa năng", "features": ["Tinh thể kim cương hình méo cạnh (nhiều điểm cắt mỗi hạt)", "Lớp phủ Nickel 3 tầng (không chứa Crom)", "Chuôi gia công chính xác, độ đảo thấp giúp mũi khoan quay đúng tâm → hệ quả là ít rung hơn, cắt chính xác hơn (low runout)", "199 hình dạng đầu × 5 cấp hạt (>300 SKU)"], "applications": ["Sửa soạn men răng, mài cùi mão", "Mở tủy", "Hoàn tất / mài viền", "Toàn sứ & CAD/CAM"], "fab": ["Tinh thể méo cạnh → nhiều điểm cắt mỗi hạt → lực cắt mạnh, thể tích cắt cao", "Lớp Nickel 3 tầng khoá hạt chắc + khoảng thoát mùn rộng → giữ hiệu năng lâu", "Chuôi độ đảo thấp → giảm rung, cắt chính xác hơn"], "usp": "Tinh thể kim cương nhiều điểm cắt, lớp phủ nickel 3 tầng giữ hạt lâu, chuôi độ đảo thấp giảm rung tay khoan", "conceptLong": "Hiệu suất cắt cao, an toàn & bền bỉ với Mani Diaburs", "tagline": "Cắt khoẻ – Bền hạt – Giảm rung", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "10", "group": "Mũi khoan", "name": "Carbide Burs", "type": "Mũi khoan tungsten carbide — cắt bằng lưỡi", "features": ["Cấu tạo 2 mảnh: đầu tungsten carbide + chuôi thép không gỉ", "Hình học lưỡi cải tiến (Improved Blade Geometry)", "8 nhóm hình dạng"], "applications": ["Tháo phục hình cũ (mão kim loại, amalgam, inlay)", "Lấy lõi cùi", "Sửa soạn xoang trám; mở tủy"], "fab": ["Cắt đứt bằng lưỡi (blade cutting) → khác DIA-BURS® cắt bằng mài mòn → phù hợp tháo phục hình kim loại/amalgam mà mũi kim cương khó cắt", "Hình học lưỡi cải tiến cân bằng độ sắc, độ bền & liên kết đầu-chuôi"], "usp": "Cắt bằng lưỡi tungsten carbide thay vì mài mòn — phù hợp để tháo mão kim loại, amalgam, inlay nơi mũi kim cương kém hiệu quả", "conceptLong": "Cắt sắc bằng lưỡi – chuyên tháo phục hình", "tagline": "Cắt lưỡi – Chuyên tháo phục hình", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "11", "group": "Mũi khoan", "name": "Surgical Burs", "type": "Carbide chuôi dài 25/28mm — tiếp cận sâu", "features": ["Carbide đầu cắt + chuôi thép dài 25/28mm", "3 SKU (#2 Round, #330 Pear, #1557 Cylinder)", "Chỉ contra-angle 4×/5×, tốc độ ≤120.000 v/p"], "applications": ["Lấy trụ kim loại", "Lấy lõi sợi (fiber core)", "Lấy vôi hoá lỗ vào ống tủy"], "fab": ["Chuôi dài 25/28mm cho tiếp cận túi tủy sâu & buồng tủy vôi hoá; taper dài cho tầm nhìn thoáng", "Chuôi đủ dài để cắm hết vào tay khoan → loại bỏ kẹt nửa chừng (halfway chucking) gây hỏng turbine"], "usp": "Chuôi dài 25–28mm cho phép vào buồng tủy sâu; chuôi cắm hết vào tay khoan nên không bị kẹt nửa chừng gây hỏng turbine", "conceptLong": "Mũi khoan carbide phẫu thuật cán dài cho các ca phẫu thuật răng", "tagline": "Tiếp cận sâu – Tầm nhìn thoáng – Bảo vệ tay khoan", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "12", "group": "Mũi khoan", "name": "MI Stainless Burs", "type": "Mũi khoan thép không gỉ — cắt chọn lọc", "features": ["Thép không gỉ (chịu 10 chu kỳ hấp tiệt khuẩn không oxy hoá)", "Góc nghiêng lưỡi (rake angle) thiết kế đặc biệt", "7 cỡ #1/2–#6, chuôi 22/28/34mm"], "applications": ["Lấy ngà sâu nhiễm trùng", "Sâu sát tủy cần bảo tồn", "Nha khoa xâm lấn tối thiểu"], "fab": ["Góc nghiêng lưỡi cắt được ngà sâu nhiễm trùng & ngà mất khoáng, nhưng KHÔNG cắt ngà cứng lành", "Phản hồi xúc giác (lưỡi không bắt mô = đã chạm ngà lành) là dấu hiệu dừng mài"], "usp": "Góc lưỡi cắt được ngà nhiễm trùng và mất khoáng, nhưng không cắt ngà cứng lành — phản hồi xúc giác khi chạm ngà lành là dấu hiệu dừng", "conceptLong": "Mũi khoan thép nạo ngà chọn lọc", "tagline": "Lấy ngà sâu – Giữ ngà lành", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "13", "group": "Mũi khoan", "name": "IPR-01EF", "type": "Mũi khoan kim cương Extra Fine — mài kẽ răng chỉnh nha", "features": ["Kim cương Extra Fine (hạt 20–30µm)", "Đường kính đầu 0,19mm (mỏng nhất trong dải sp Mani DIA-BURS®)", "Dùng một lần (đủ cho ca trên + dưới), ≤160.000 v/p"], "applications": ["Mài kẽ răng (IPR) trong chỉnh nha aligner", "Chỉnh nha mắc cài"], "fab": ["Đầu mỏng 0,19mm vào được vùng kẽ răng chật mà miếng nhám tay / đĩa mài khó vào", "Hạt Extra Fine cho rung tối thiểu, kiểm soát mức mài chính xác"], "usp": "Đầu mỏng 0,19mm vào được vùng kẽ răng chật; hạt Extra Fine kiểm soát lượng mài chính xác trong quy trình IPR chỉnh nha", "conceptLong": "Mũi khoan mài kẽ đường kính chỉ 0.19mm chuyên dụng cho chỉnh nha bằng khay trong", "tagline": "IPR chính xác – Kiểm soát lượng mài", "ifu": "https://drive.google.com/file/d/1SYBQr9sITuqTH8fly1U4G_7_98QLi2P9/view?usp=drive_link", "brochure": "https://drive.google.com/file/d/10EUpZavAsaGXeFk41ZTVLoWEhKBbjJlP/view?usp=sharing", "image": "https://drive.google.com/file/d/1nEYAYTeOH0ol5XUUYf9rpJF3dyjzu70b/view?usp=sharing", "video": "https://drive.google.com/file/d/14WygbAxeL-tz0HHcD05QZNQDXsGIP26l/view?usp=sharing", "presentation": "https://docs.google.com/presentation/d/1h3pyRU2VFGn5Q52fiA1teGGhnbbCWHPp/edit?usp=sharing&ouid=109650167745247774645&rtpof=true&sd=true"}, {"stt": "14", "group": "Chỉ khâu", "name": "Mani Dental Sutures", "type": "Chỉ khâu gắn kim sẵn (atraumatic) — không tiêu", "features": ["Kim & chỉ tiệt khuẩn sẵn, gắn kim sẵn với lỗ kim bằng laser (atraumatic (đường kính kim vs chỉ khâu tương đương) = giảm chấn thương mô khi xuyên kim)", "5 loại đầu kim × 5 độ cong × 4 vật liệu (Lụa, Polyester, Nylon bện, Nylon đơn sợi)", "Dải cỡ USP 2-0 → 7-0 (40 mã)"], "applications": ["Đóng vạt nướu nha chu / implant", "Khâu mô cứng", "Khâu thẩm mỹ vùng trước", "Vi phẫu nha khoa"], "fab": ["Kim thép vi xử lý đầu sắc + mối nối kim-chỉ (swage) bền → xuyên mô êm, không tuột chỉ", "Bộ 40 mã phủ từ phẫu thuật thông thường đến vi phẫu (6-0, 7-0) → chọn được kim & chỉ cho từng loại mô"], "usp": "Kim khâu vs lỗ kim bằng laser, an toàn xuyên mô êm, mối nối kim-chỉ bền; 40 mã phủ từ phẫu thuật thông thường đến vi phẫu nha khoa", "conceptLong": "Kim sắc – Chỉ bền – Đủ lựa chọn cho mọi ca phẫu thuật nha khoa", "tagline": "Kim sắc – Chỉ bền – Ứng dụng đa dạng", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "15", "group": "Vật liệu — Composite", "name": "Mani Nano", "type": "Composite nano — phục hồi chịu lực & tái tạo cùi răng", "features": ["Hạt độn nanohybrid (kết hợp hạt micro + nano)", "Mô-đun đàn hồi 16.575 MPa & độ bền nén 432 MPa", "Co ngót trùng hợp 1,66% (thấp trong danh mục)", "Cản quang 220% Al; 8 màu (gồm Opaque Dentin — màu ngà đục)", "Lưu ý: dòng này có chứa Bis-GMA"], "applications": ["Trám Class I–V trước & sau", "Inlay / onlay / veneer", "Tái tạo cùi răng (đặc biệt răng đã nội nha)"], "fab": ["Hạt độn nano siêu mịn → mô-đun đàn hồi cao, co ngót thấp → miếng trám chịu lực tốt, giảm stress co ngót & nứt rìa", "Cản quang 220% → dễ phân biệt với mô răng, phát hiện sâu thứ phát trên X-quang"], "usp": "Hạt độn nanohybrid cho mô-đun đàn hồi cao (16.575 MPa) và co ngót thấp (1,66%) — phù hợp phục hồi răng chịu lực và tái tạo cùi sau nội nha", "conceptLong": "Composite Nano với đặc tính vật lý vượt trội và độ co ngót chỉ 1.66%", "tagline": "Co ngót tối thiểu - chịu lực tối đa", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "16", "group": "Vật liệu — Composite", "name": "Mani EG (Hybrid Ease)", "type": "Composite Bio-Hybrid universal — không Bis-GMA, hệ màu Chromatic", "features": ["Không chứa Bis-GMA (tương thích sinh học)", "Hàm lượng độn 81%w/77%v (cao trong dải composite dạng paste)", "Hệ màu Chromatic Shade (tự thích ứng theo màu răng)", "Độ dính thấp với bay trám kim loại & không bị xệ (no sagging)", "Tuân thủ ISO 4049"], "applications": ["Trám Class I–V trước & sau", "Inlay / onlay / veneer", "Tái tạo cùi răng"], "fab": ["Không Bis-GMA + độn cao → hướng tương thích sinh học, bền", "Hệ màu Chromatic tự hoà theo màu răng → giảm số shade cần lưu, thẩm mỹ tự nhiên", "Độ dính thấp với bay trám + không bị xệ → đặt đến đâu giữ hình đến đó, dễ tạo hình hố rãnh/múi"], "usp": "Không chứa Bis-GMA; hàm lượng độn 81%w; màu Chromatic tự hoà theo răng; độ dính thấp với bay trám giúp đặt vật liệu đúng vị trí mà không bị xệ", "conceptLong": "Composite đặc đa năng, dễ thao tác, tạo hình ổn định và không có Bis GMA", "tagline": "Thao tác dễ dàng & An toàn sinh học", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "17", "group": "Vật liệu — Composite", "name": "Mani Micro", "type": "Composite micro-hybrid — thẩm mỹ cao", "features": ["Hạt độn siêu mịn (0,005–3µm) → bề mặt mịn đồng nhất", "Đánh bóng cao & kháng mảng bám (độ nhám tối thiểu)", "Lưu ý: dòng này có chứa Bis-GMA"], "applications": ["Trám Class I–V trước & sau", "Inlay / onlay / veneer", "Chỉnh thẩm mỹ"], "fab": ["Hạt độn siêu mịn → đánh bóng cao, bề mặt mịn → kháng mảng bám, thẩm mỹ class A", "Smart Shade một màu tự thích ứng → giảm số shade cần lưu, hoà màu phần lớn trường hợp"], "usp": "Hạt độn siêu mịn (0,005–3µm) cho bề mặt mịn đồng nhất, kháng mảng bám tốt; màu Smart Shade tự thích ứng theo màu răng xung quanh", "conceptLong": "Thẩm mỹ cao – Đánh bóng mịn – Một màu Smart Shade", "tagline": "Đọ bóng vượt trội - tối ưu thẩm mỹ vùng răng cửa", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "18", "group": "Vật liệu — Composite", "name": "Mani Bulk", "type": "Composite bulk-fill chảy lỏng — trám khối răng sau", "features": ["Không chứa Bis-GMA", "Đặt lớp dày tới 4mm (bulk-fill = trám khối, không cần chia lớp 2mm)", "Cản quang 210% Al; co ngót 2,8%", "Hiệu ứng tắc kè hoa (chameleon), 2 màu"], "applications": ["Trám Class I ≤4mm (một lớp)", "Lót đáy (base) Class II ≤4mm"], "fab": ["Bulk-fill cho phép đặt 1 lớp 4mm thay vì 2 lớp 2mm → rút ngắn thời gian trám răng sau", "Cản quang 210% → dễ phát hiện sâu thứ phát trên X-quang; không Bis-GMA"], "usp": "Đặt được một lớp dày tới 4mm mà không cần chia lớp — rút ngắn thời gian trám răng sau; không chứa Bis-GMA", "conceptLong": "Trám khối dễ dàng lên đến 4mm", "tagline": "Trám khối 4mm – Nhanh – Không Bis-GMA", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "19", "group": "Vật liệu — Composite", "name": "Mani Flo-V", "type": "Composite chảy lỏng độ nhớt cao — không Bis-GMA", "features": ["Không chứa Bis-GMA", "Độ nhớt cao (High Viscosity Flowable): chảy được nhưng vẫn đứng yên khi không có lực", "Hàm lượng độn 77%w, cản quang 210% Al, 7 màu"], "applications": ["Trám bít hố rãnh", "Class V (cổ răng)", "Xâm lấn tối thiểu Class I/II/III"], "fab": ["Độ nhớt cao → chảy đủ để vào vùng nhỏ nhưng đứng yên khi buông tay → không nhỏ giọt khỏi xoang,giúp đặt đúng vị trí", "Không Bis-GMA"], "usp": "Độ nhớt cao: chảy đủ để vào vùng nhỏ hẹp, giữ nguyên vị trí khi không có lực — không nhỏ giọt khỏi xoang; không chứa Bis-GMA", "conceptLong": "Composite lỏng độ nhớt cao cho trám lót và hố rãnh", "tagline": "Độ nhớt cao – Không nhỏ giọt – Không Bis-GMA", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "21", "group": "Vật liệu — Keo dán", "name": "Mani Bond", "type": "Keo dán thế hệ 7 — tự xoi mòn (self-etch), một lọ, một bước", "features": ["Cơ chế dán dính lai: 10-MDP (liên kết hoá học với canxi của men/ngà) + 4-META (khoá cơ học vi thể trong ống ngà)", "Một lọ 5ml, một bước (tích hợp xoi mòn + lót + dán dính)", "Không chứa TEGDMA & MMA", "pH 2,0–2,5; bảo quản 2–25°C (không cần tủ lạnh)"], "applications": ["Trám composite trực tiếp", "Inlay / onlay / veneer / mão gắn composite", "Sứ zirconia (dùng cùng Mani Cem)", "Sửa miếng trám composite"], "fab": ["10-MDP tạo muối MDP-Ca bền với canxi của hydroxyapatite → dán dính hoá học", "4-META giúp monomer thấm vào ống ngà & mạng collagen → khoá cơ học vi thể", "Một lọ, một bước → đơn giản quy trình so keo dán nhiều chai thế hệ cũ"], "usp": "10-MDP tạo liên kết hoá học với canxi hydroxyapatite; 4-META khoá cơ học vào ống ngà — một lọ, một bước tích hợp xoi mòn và dán dính", "conceptLong": "Bond một bước thế hệ VII, lực dán dính vượt trội > 30 MPa", "tagline": "Dán dính tin cậy – Quy trình đơn giản", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "22", "group": "Vật liệu — Tẩy trắng", "name": "Mani Bleach Office", "type": "Gel tẩy trắng tại ghế — 35% H₂O₂, cartridge automix 4:1", "features": ["Nồng độ H₂O₂ 35% (sau khi trộn)", "pH trung tính 7,3", "Cartridge automix 4:1 (tự trộn khi bơm, không trộn tay)", "Phụ gia tái khoáng hoá (kali nitrat, natri florua); dạng gel không chảy"], "applications": ["Răng đổi màu (kể cả đã điều trị nội nha)", "Đổi màu do bệnh / chấn thương / thuốc (tetracycline)"], "fab": ["pH trung tính 7,3 + kali nitrat + natri florua → giảm ê buốt cho bệnh nhân", "Cartridge automix trộn đều tỉ lệ 4:1 → không phụ thuộc thao tác trộn tay, chất lượng đồng nhất"], "usp": "H₂O₂ 35%, pH trung tính 7,3 kết hợp kali nitrat và natri florua giảm ê buốt; cartridge automix 4:1 đảm bảo tỉ lệ trộn đồng nhất", "conceptLong": "Mani Bleach'n Shine - Tẩy trắng An toàn , hiệu quả và không cần chiếu đèn", "tagline": "Tẩy trắng hiệu quả – Hạn chế ê buốt & Không cần đèn", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "23", "group": "Vật liệu — Tẩy trắng", "name": "Mani Gingiva Protector", "type": "Vật liệu cách ly nướu — trùng hợp ánh sáng", "features": ["Vật liệu trùng hợp ánh sáng, màu xanh dương, dễ tháo sau tẩy", "Lớp rộng 4–6mm × sâu 2mm"], "applications": ["Cách ly nướu trong quy trình tẩy trắng tại ghế"], "fab": ["Tạo lớp cách ly (đóng vai đê cao su) ép vào kẽ răng → bảo vệ nướu khỏi gel 35% H₂O₂"], "usp": "Vật liệu trùng hợp ánh sáng đóng vai trò đê cách ly, ngăn gel H₂O₂ 35% tiếp xúc nướu và kẽ răng trong quy trình tẩy trắng tại ghế", "conceptLong": "Composite lỏng bảo vệ nướu khi tẩy trắng", "tagline": "Cách ly nướu – Bảo vệ mô mềm", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}, {"stt": "24", "group": "Vật liệu — Tẩy trắng", "name": "Mani After Bleach Care", "type": "Kem giảm ê buốt sau tẩy trắng", "features": ["Kali nitrat (giảm ê buốt) + natri florua (tái khoáng hoá men)", "Kem nền nước, hương bạc hà, dùng tại phòng khám"], "applications": ["Giảm ê buốt & tái khoáng hoá ngay sau quy trình tẩy trắng"], "fab": ["Kali nitrat làm giảm dẫn truyền tín hiệu thần kinh ngà → giảm ê buốt", "Natri florua tái khoáng hoá men sau khử khoáng nhẹ do peroxide"], "usp": "Kali nitrat làm giảm dẫn truyền tín hiệu thần kinh ngà; natri florua tái khoáng hoá men sau khi peroxide tác động — dùng ngay sau khi kết thúc tẩy", "conceptLong": "Giảm ê buốt – Tái khoáng hoá sau tẩy", "tagline": "Giảm ê buốt – Tái khoáng hoá sau tẩy", "ifu": "", "brochure": "", "image": "", "video": "", "presentation": ""}];
+
+const ICONS={
+  photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg>',
+  feat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+  app:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  fab:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+  usp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1L12 2z"/></svg>',
+  concept:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2zM9 21h6"/></svg>',
+  media:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="m10 9 5 3-5 3z"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+  vid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>',
+  ppt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M12 18v3M8 21h8"/></svg>',
+  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>',
+  dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>'
+};
+
+let PRODUCTS=[];
+let activeGroup='all', searchTerm='';
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- DRIVE URL HELPERS ---------- */
+function driveId(url){
+  if(!url) return null;
+  let m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)||url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/)||
+        url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/)||url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)||
+        url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m?m[1]:null;
+}
+function isYouTube(url){return /youtube\.com|youtu\.be/.test(url||'')}
+function ytEmbed(url){
+  let m=url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m?`https://www.youtube.com/embed/${m[1]}`:url;
+}
+// Loại media: pdf | image | video | presentation | doc | sheet | link
+function detectKind(url,hintKind){
+  if(!url) return null;
+  if(isYouTube(url)) return 'video';
+  if(/\/presentation\/d\//.test(url)) return 'presentation';
+  if(/\/document\/d\//.test(url)) return 'doc';
+  if(/\/spreadsheets\/d\//.test(url)) return 'sheet';
+  if(hintKind) return hintKind;        // dùng gợi ý theo tên cột
+  if(/\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(url)) return 'image';
+  if(/\.pdf(\?|$)/i.test(url)) return 'pdf';
+  if(/\.(mp4|webm|mov)(\?|$)/i.test(url)) return 'video';
+  return 'link';
+}
+// Trả về URL nhúng inline phù hợp
+function embedUrl(url,kind){
+  const id=driveId(url);
+  if(isYouTube(url)) return ytEmbed(url);
+  if(/\/presentation\/d\//.test(url)&&id) return `https://docs.google.com/presentation/d/${id}/embed`;
+  if(/\/document\/d\//.test(url)&&id) return `https://docs.google.com/document/d/${id}/preview`;
+  if(/\/spreadsheets\/d\//.test(url)&&id) return `https://docs.google.com/spreadsheets/d/${id}/preview`;
+  if(id) return `https://drive.google.com/file/d/${id}/preview`; // pdf/video/doc trên Drive
+  return url;
+}
+function imgUrl(url){
+  const id=driveId(url);
+  if(id) return `https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
+  return url;
+}
+function openUrl(url){
+  const id=driveId(url);
+  if(/\/presentation\/d\//.test(url)&&id) return `https://docs.google.com/presentation/d/${id}/edit`;
+  if(id&&!/docs\.google/.test(url)) return `https://drive.google.com/file/d/${id}/view`;
+  return url;
+}
+function dlUrl(url){
+  const id=driveId(url);
+  if(id&&!/docs\.google/.test(url)) return `https://drive.google.com/uc?export=download&id=${id}`;
+  return url;
+}
+
+/* ---------- DATA LOAD (JSONP để tránh CORS với HTML ngoài) ---------- */
+let _jsonpSeq=0;
+function jsonp(params){
+  return new Promise((resolve,reject)=>{
+    const cb='__mmh_cb_'+(_jsonpSeq++);
+    const s=document.createElement('script');
+    const to=setTimeout(()=>{cleanup();reject(new Error('Timeout — kiểm tra quyền truy cập Web App'))},15000);
+    function cleanup(){clearTimeout(to);delete window[cb];s.remove()}
+    window[cb]=data=>{cleanup();resolve(data)};
+    const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+    s.src=API_URL+'?'+qs+'&callback='+cb;
+    s.onerror=()=>{cleanup();reject(new Error('Không gọi được Web App'))};
+    document.body.appendChild(s);
+  });
+}
+
+function setConn(state,text,meta){
+  const dot=document.getElementById('connDot');
+  dot.className='conn-dot '+state;
+  document.getElementById('connText').innerHTML=text;
+  document.getElementById('connMeta').textContent=meta||'';
+}
+
+async function loadData(manual){
+  const rb=document.getElementById('refreshBtn');
+  rb.classList.add('spinning');
+  if(!USE_LIVE){
+    PRODUCTS=FALLBACK.map((p,i)=>({...p,_row:i}));
+    setConn('off','Chế độ offline — dùng dữ liệu nhúng','');
+    rerender();rb.classList.remove('spinning');return;
+  }
+  setConn('loading','Đang tải dữ liệu từ Google Sheet…','');
+  try{
+    const res=await jsonp({action:'list'});
+    if(!res||!res.ok) throw new Error(res&&res.error||'Phản hồi không hợp lệ');
+    PRODUCTS=res.data;
+    const now=new Date().toLocaleTimeString('vi-VN');
+    setConn('on','Đã kết nối <span class="src">Google Sheet</span> • dữ liệu trực tiếp','Cập nhật '+now);
+    rerender();
+    if(manual) toast('Đã làm mới dữ liệu');
+  }catch(err){
+    PRODUCTS=FALLBACK.map((p,i)=>({...p,_row:i}));
+    setConn('off','Không kết nối được Sheet — đang xem dữ liệu nhúng. <a href="'+API_URL+'" target="_blank">Mở Web App</a>',String(err.message||err));
+    rerender();
+    if(manual) toast('Lỗi kết nối: '+(err.message||err),true);
+  }finally{rb.classList.remove('spinning')}
+}
+
+/* ---------- RENDER ---------- */
+function groupCounts(){const m={};PRODUCTS.forEach(p=>{if(p.group)m[p.group]=(m[p.group]||0)+1});return m}
+function renderFilters(){
+  const c=groupCounts(),gs=Object.keys(c).sort();
+  let h=`<div class="filter-item ${activeGroup==='all'?'active':''}" onclick="setGroup('all')"><span>Tất cả</span><span class="count">${PRODUCTS.length}</span></div>`;
+  gs.forEach(g=>{h+=`<div class="filter-item ${activeGroup===g?'active':''}" onclick="setGroup(${JSON.stringify(g).replace(/"/g,'&quot;')})"><span>${esc(g)}</span><span class="count">${c[g]}</span></div>`});
+  document.getElementById('filters').innerHTML=h;
+}
+function renderStats(){
+  const gn=new Set(PRODUCTS.map(p=>p.group).filter(Boolean)).size;
+  const media=PRODUCTS.filter(p=>p.ifu||p.brochure||p.image||p.video||p.presentation).length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="n">${PRODUCTS.length}</div><div class="l">Sản phẩm</div></div>
+    <div class="stat"><div class="n">${gn}</div><div class="l">Nhóm sản phẩm</div></div>
+    <div class="stat"><div class="n">${media}</div><div class="l">Có tài liệu / media</div></div>
+    <div class="stat"><div class="n">${PRODUCTS.filter(p=>p.tagline).length}</div><div class="l">Đã có tagline</div></div>`;
+}
+function filtered(){
+  const t=searchTerm.toLowerCase();
+  return PRODUCTS.filter(p=>{
+    if(activeGroup!=='all'&&p.group!==activeGroup)return false;
+    if(!t)return true;
+    const blob=[p.name,p.type,p.group,p.usp,p.tagline,p.conceptLong,(p.features||[]).join(' '),(p.applications||[]).join(' '),(p.fab||[]).join(' ')].join(' ').toLowerCase();
+    return blob.includes(t);
+  });
+}
+function mediaChips(p){
+  const items=[];
+  if(p.ifu)items.push(ICONS.pdf);
+  if(p.brochure)items.push(ICONS.pdf);
+  if(p.video)items.push(ICONS.vid);
+  if(p.presentation)items.push(ICONS.ppt);
+  if(!items.length)return '';
+  return `<div class="mediachips">${items.slice(0,4).map(i=>`<div class="mchip">${i}</div>`).join('')}</div>`;
+}
+function renderGrid(){
+  const list=filtered();
+  document.getElementById('viewTitle').textContent=activeGroup==='all'?'Tất cả sản phẩm':activeGroup;
+  document.getElementById('viewSub').textContent=`${list.length} sản phẩm${searchTerm?` khớp "${searchTerm}"`:''}`;
+  const g=document.getElementById('grid');
+  if(!list.length){g.innerHTML=`<div class="empty" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><p>Không tìm thấy sản phẩm nào.</p></div>`;return}
+  g.innerHTML=list.map(p=>{
+    const hasImg=!!p.image;
+    const photo=hasImg
+      ? `<img src="${esc(imgUrl(p.image))}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.ph').style.display='flex'"><div class="ph" style="display:none">${ICONS.photo}<span>Ảnh lỗi</span></div><div class="glare"></div>`
+      : `<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
+    return `<div class="card" onclick="openDetail(${p._row})">
+      <div class="card-photo-wrap"><div class="photo" data-tilt>${photo}<div class="grouptag">${esc(p.group)}</div>${mediaChips(p)}</div></div>
+      <div class="body"><div class="pname">${esc(p.name)}</div><div class="ptype">${esc(p.type)}</div>
+      ${p.tagline?`<div class="tagline">${esc(p.tagline)}</div>`:''}</div></div>`;
+  }).join('');
+  attachTilts();
+}
+function renderSkeleton(){
+  document.getElementById('grid').innerHTML=Array(6).fill(0).map(()=>`<div class="skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:50%"></div><div class="sk-line" style="width:90%;height:30px;margin-top:8px"></div></div></div>`).join('');
+}
+
+/* ---------- 3D TILT on cards ---------- */
+function attachTilts(){
+  document.querySelectorAll('.photo[data-tilt]').forEach(el=>{
+    if(el._tilt)return;el._tilt=true;
+    el.addEventListener('mousemove',e=>{
+      const r=el.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+      el.style.transform=`rotateX(${(.5-py)*10}deg) rotateY(${(px-.5)*10}deg) scale(1.05)`;
+      const g=el.querySelector('.glare');if(g){g.style.opacity=.8;g.style.background=`radial-gradient(circle at ${px*100}% ${py*100}%,rgba(255,255,255,.5),transparent 55%)`}
+    });
+    el.addEventListener('mouseleave',()=>{el.style.transform='';const g=el.querySelector('.glare');if(g)g.style.opacity=0});
+  });
+}
+
+/* ---------- DETAIL ---------- */
+function blistHTML(arr,cls){if(!arr||!arr.length)return '<p style="color:#94a3b8;font-style:italic">Chưa có dữ liệu.</p>';return `<ul class="blist ${cls||''}">${arr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`}
+
+function mediaItemHTML(label,url,colHint){
+  if(!url)return '';
+  const kind=detectKind(url,colHint);
+  const icoClass={pdf:'pdf',image:'img',video:'vid',presentation:'ppt',doc:'doc',sheet:'doc',link:'doc'}[kind]||'doc';
+  const ico={pdf:ICONS.pdf,image:ICONS.photo,video:ICONS.vid,presentation:ICONS.ppt,doc:ICONS.pdf,sheet:ICONS.pdf,link:ICONS.ext}[kind]||ICONS.ext;
+  const kindLabel={pdf:'PDF',image:'Hình ảnh',video:'Video',presentation:'Slide trình bày',doc:'Tài liệu',sheet:'Bảng tính',link:'Liên kết'}[kind];
+  let viewer='';
+  if(kind==='image'){
+    viewer=`<img class="media-img" src="${esc(imgUrl(url))}" onclick="openLightbox('${esc(imgUrl(url))}')" onerror="this.outerHTML='<div class=&quot;no-media&quot;>${ICONS.photo}<p>Không tải được ảnh. Kiểm tra quyền chia sẻ Drive.</p></div>'">`;
+  }else if(kind==='link'){
+    viewer=`<div class="no-media">${ICONS.ext}<p>Liên kết ngoài — mở ở tab mới để xem.</p></div>`;
+  }else{
+    const cls=kind==='video'?'vid':(kind==='presentation'?'ppt':(kind==='doc'||kind==='sheet'?'doc':'pdf'));
+    viewer=`<iframe class="media-frame ${cls}" src="${esc(embedUrl(url,kind))}" allow="autoplay;fullscreen" allowfullscreen loading="lazy"></iframe>`;
+  }
+  return `<div class="media-card">
+    <div class="mc-head">
+      <div class="mc-ico ${icoClass}">${ico}</div>
+      <div class="mc-title"><b>${esc(label)}</b><small>${kindLabel}</small></div>
+      <div class="mc-actions">
+        <a class="mc-btn" href="${esc(openUrl(url))}" target="_blank" title="Mở tab mới">${ICONS.ext}</a>
+        <a class="mc-btn" href="${esc(dlUrl(url))}" target="_blank" title="Tải về">${ICONS.dl}</a>
+      </div>
+    </div>${viewer}</div>`;
+}
+
+function openDetail(row){
+  const p=PRODUCTS.find(x=>x._row===row);if(!p)return;
+  const hero=p.image?`<img class="heroimg" src="${esc(imgUrl(p.image))}" onerror="this.style.display='none'">`:`<div class="heroph">${ICONS.photo}</div>`;
+  const mediaCount=[p.ifu,p.brochure,p.video,p.presentation,p.image].filter(Boolean).length;
+  const mediaHTML=[
+    mediaItemHTML('Ảnh sản phẩm',p.image,'image'),
+    mediaItemHTML('IFU — Hướng dẫn sử dụng',p.ifu,'pdf'),
+    mediaItemHTML('Brochure / Catalogue',p.brochure,'pdf'),
+    mediaItemHTML('Video',p.video,'video'),
+    mediaItemHTML('Presentation',p.presentation,'presentation'),
+  ].filter(Boolean).join('');
+  let h=`
+    <div class="modal-hero">${hero}
+      <button class="modal-close" onclick="closeDetail()">${ICONS.close}</button>
+      <button class="modal-edit-btn" onclick="openEdit(${p._row})">${ICONS.edit} Sửa</button>
+      <div class="hero-txt"><span class="htag">${esc(p.group)}</span><h2>${esc(p.name)}</h2></div>
+    </div>
+    <div class="modal-tabs">
+      <div class="mtab active" onclick="switchTab(this,'tab-info')">${ICONS.info} Thông tin</div>
+      <div class="mtab" onclick="switchTab(this,'tab-media')">${ICONS.media} Media &amp; Tài liệu ${mediaCount?`<span class="dot"></span>`:''}</div>
+    </div>
+    <div class="modal-body">
+      <div class="tab-pane active" id="tab-info">
+        ${p.tagline?`<div class="tagline-big"><div class="lbl">Concept Tagline</div><div class="val">${esc(p.tagline)}</div></div>`:''}
+        ${p.type?`<div class="sec"><div class="sec-h"><div class="ic">${ICONS.concept}</div>Loại / Phân loại</div><p>${esc(p.type)}</p></div>`:''}
+        <div class="sec"><div class="sec-h"><div class="ic">${ICONS.feat}</div>Đặc tính &amp; công nghệ chính</div>${blistHTML(p.features)}</div>
+        <div class="sec"><div class="sec-h"><div class="ic">${ICONS.app}</div>Ứng dụng</div>${blistHTML(p.applications,'app')}</div>
+        <div class="sec"><div class="sec-h"><div class="ic">${ICONS.fab}</div>Diễn giải FAB — Đặc tính → Lợi ích</div>${blistHTML(p.fab,'fab')}</div>
+        ${p.usp?`<div class="sec"><div class="sec-h"><div class="ic">${ICONS.usp}</div>USP — Điểm bán độc nhất</div><div class="usp-box">${esc(p.usp)}</div></div>`:''}
+        ${p.conceptLong?`<div class="sec"><div class="sec-h"><div class="ic">${ICONS.concept}</div>Concept (Dài)</div><div class="concept-box">${esc(p.conceptLong)}</div></div>`:''}
+      </div>
+      <div class="tab-pane" id="tab-media">
+        ${mediaHTML?`<div class="media-grid">${mediaHTML}</div>`:`<div class="no-media">${ICONS.media}<p>Sản phẩm này chưa có tài liệu/media.<br>Bấm <b>Sửa</b> để thêm link Drive.</p></div>`}
+      </div>
+    </div>`;
+  const m=document.getElementById('detailModal');
+  m.innerHTML=h;m.scrollTop=0;
+  document.getElementById('detailOverlay').classList.add('open');document.body.style.overflow='hidden';
+}
+function switchTab(el,id){
+  el.parentElement.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const body=el.closest('.modal').querySelector('.modal-body');
+  body.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  body.querySelector('#'+id).classList.add('active');body.scrollTop=0;
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow=''}
+
+function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
+
+/* ---------- EDIT ---------- */
+function openEdit(row){
+  const isNew=row==null;
+  const p=isNew?{group:'',name:'',type:'',features:[],applications:[],fab:[],usp:'',conceptLong:'',tagline:'',ifu:'',brochure:'',image:'',video:'',presentation:''}:PRODUCTS.find(x=>x._row===row);
+  if(!p)return;
+  const groups=[...new Set(PRODUCTS.map(x=>x.group).filter(Boolean))].sort();
+  const L=a=>(a||[]).join('\n');
+  let h=`
+    <div class="modal-hero" style="height:84px;align-items:center">
+      <button class="modal-close" onclick="closeEdit()">${ICONS.close}</button>
+      <div class="hero-txt" style="padding:0 28px"><h2 style="font-size:20px">${isNew?'Thêm sản phẩm mới':'Chỉnh sửa: '+esc(p.name)}</h2></div>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>Tên sản phẩm *</label><input id="f_name" value="${esc(p.name)}"></div>
+        <div class="field"><label>Nhóm *</label><input id="f_group" list="grouplist" value="${esc(p.group)}"><datalist id="grouplist">${groups.map(g=>`<option value="${esc(g)}">`).join('')}</datalist></div>
+      </div>
+      <div class="field"><label>Loại / Phân loại</label><input id="f_type" value="${esc(p.type)}"></div>
+      <div class="field"><label>Concept Tagline</label><input id="f_tagline" value="${esc(p.tagline)}"></div>
+      <div class="field"><label>Đặc tính &amp; công nghệ chính <span style="font-weight:400;text-transform:none;color:#94a3b8">(mỗi dòng 1 ý)</span></label><textarea id="f_features" rows="4">${esc(L(p.features))}</textarea></div>
+      <div class="field"><label>Ứng dụng <span style="font-weight:400;text-transform:none;color:#94a3b8">(mỗi dòng 1 ý)</span></label><textarea id="f_apps" rows="3">${esc(L(p.applications))}</textarea></div>
+      <div class="field"><label>Diễn giải FAB <span style="font-weight:400;text-transform:none;color:#94a3b8">(mỗi dòng 1 ý)</span></label><textarea id="f_fab" rows="4">${esc(L(p.fab))}</textarea></div>
+      <div class="field"><label>USP</label><textarea id="f_usp" rows="2">${esc(p.usp)}</textarea></div>
+      <div class="field"><label>Concept (Dài)</label><textarea id="f_concept" rows="3">${esc(p.conceptLong)}</textarea></div>
+      <div class="form-group-label">Media &amp; Tài liệu (dán link Google Drive)</div>
+      <div class="field"><label>Ảnh</label><input id="f_image" value="${esc(p.image)}" placeholder="https://drive.google.com/file/d/.../view"></div>
+      <div class="field"><label>IFU</label><input id="f_ifu" value="${esc(p.ifu)}"></div>
+      <div class="field"><label>Brochure</label><input id="f_brochure" value="${esc(p.brochure)}"></div>
+      <div class="field"><label>Video</label><input id="f_video" value="${esc(p.video)}" placeholder="Link Drive hoặc YouTube"></div>
+      <div class="field"><label>Presentation</label><input id="f_presentation" value="${esc(p.presentation)}"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeEdit()">Huỷ</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveEdit(${isNew?'null':p._row})">${ICONS.check} Lưu vào Sheet</button>
+    </div>`;
+  const m=document.getElementById('editModal');m.innerHTML=h;m.scrollTop=0;
+  document.getElementById('editOverlay').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeEdit(){document.getElementById('editOverlay').classList.remove('open');if(!document.getElementById('detailOverlay').classList.contains('open'))document.body.style.overflow=''}
+function toLines(id){return document.getElementById(id).value.split('\n').map(s=>s.trim()).filter(Boolean)}
+function val(id){return document.getElementById(id).value.trim()}
+
+async function saveEdit(row){
+  const name=val('f_name'),group=val('f_group');
+  if(!name||!group){toast('Vui lòng nhập Tên và Nhóm',true);return}
+  const data={name,group,type:val('f_type'),tagline:val('f_tagline'),
+    features:toLines('f_features'),applications:toLines('f_apps'),fab:toLines('f_fab'),
+    usp:val('f_usp'),conceptLong:val('f_concept'),
+    image:val('f_image'),ifu:val('f_ifu'),brochure:val('f_brochure'),video:val('f_video'),presentation:val('f_presentation')};
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.innerHTML=ICONS.check+' Đang lưu…';
+  const isNew=row==null;
+  if(USE_LIVE){
+    try{
+      const res=await jsonp({action:isNew?'create':'update',payload:JSON.stringify(isNew?{data:data}:{_row:row,data:data})});
+      if(!res||!res.ok)throw new Error(res&&res.error||'Lỗi ghi Sheet');
+      toast(isNew?'Đã thêm sản phẩm vào Sheet':'Đã cập nhật Sheet');
+      closeEdit();
+      await loadData(false);
+      if(!isNew)openDetail(row);
+    }catch(err){
+      btn.disabled=false;btn.innerHTML=ICONS.check+' Lưu vào Sheet';
+      toast('Lỗi: '+(err.message||err),true);
+    }
+  }else{
+    // offline
+    if(isNew){data._row=PRODUCTS.length;PRODUCTS.push(data)}else{Object.assign(PRODUCTS.find(x=>x._row===row),data)}
+    toast(isNew?'Đã thêm (offline)':'Đã cập nhật (offline)');closeEdit();rerender();if(!isNew)openDetail(row);
+  }
+}
+
+function toast(msg,isErr){
+  const t=document.getElementById('toast');
+  t.className='toast'+(isErr?' err':'');
+  t.innerHTML=(isErr?ICONS.info:ICONS.check)+'<span>'+esc(msg)+'</span>';
+  t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+function setGroup(g){activeGroup=g;renderFilters();renderGrid()}
+function rerender(){renderFilters();renderStats();renderGrid()}
+document.getElementById('search').addEventListener('input',e=>{searchTerm=e.target.value.trim();renderGrid()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){
+  if(document.getElementById('lightbox').classList.contains('open'))document.getElementById('lightbox').classList.remove('open');
+  else if(document.getElementById('editOverlay').classList.contains('open'))closeEdit();
+  else if(document.getElementById('detailOverlay').classList.contains('open'))closeDetail();
+}});
+
+renderSkeleton();
+loadData(false);
+</script>
+</body>
+</html>
