@@ -504,7 +504,8 @@ const ICONS={
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>',
   rotate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8M3 3v5h5"/></svg>',
   drag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>',
-  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>'
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>'
 };
 
 let PRODUCTS=[], activeGroup='all', searchTerm='', _currentRow=null;
@@ -542,6 +543,12 @@ function embedUrl(url,kind){
   return url;
 }
 function imgUrl(url){const id=driveId(url);return id?`https://drive.google.com/thumbnail?id=${id}&sz=w1600`:url}
+// URL ảnh thay thế khi thumbnail lỗi (thử lần lượt)
+function imgAltUrl(url,attempt){
+  const id=driveId(url);if(!id)return url;
+  const alts=[`https://lh3.googleusercontent.com/d/${id}=w1600`,`https://drive.google.com/uc?export=view&id=${id}`,`https://drive.google.com/thumbnail?id=${id}&sz=w800`];
+  return alts[attempt]||url;
+}
 /* Tách nhiều link ảnh (cách nhau bằng dấu phẩy / xuống dòng / "|") → mảng URL hiển thị.
    Nếu có ≥2 ảnh → bật chế độ xoay 360° image-sequence kiểu Sketchfab. */
 function splitImages(raw){
@@ -709,6 +716,30 @@ function blistHTML(arr,cls){
   if(!arr||!arr.length)return '<p style="color:#9aa9bb;font-style:italic">Chưa có dữ liệu.</p>';
   return `<ul class="blist ${cls||''}">${arr.map((x,i)=>`<li><span class="num">${i+1}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
 }
+/* UI xem slide trình bày — dùng Google Slides embed (có điều hướng slide tích hợp) + nút mở rộng */
+function presentationHTML(url){
+  if(!url) return '';
+  const id=driveId(url);
+  const isGSlides=/\/presentation\/d\//.test(url);
+  if(isGSlides&&id){
+    // delayms lớn để không tự chạy; embed của Google có sẵn nút ◀ ▶ chuyển từng slide
+    const embed=`https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=60000&rm=minimal`;
+    return `<div class="mcard">
+      <div class="mch">
+        <div class="mci ppt">${ICONS.ppt}</div>
+        <div class="mct"><b>Slide trình bày</b><small>Dùng nút ◀ ▶ ở khung dưới để xem từng slide</small></div>
+        <div class="mca">
+          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/present" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play||ICONS.ext}</a>
+          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở trong Google Slides">${ICONS.ext}</a>
+        </div>
+      </div>
+      <iframe class="mframe ppt" src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe>
+    </div>`;
+  }
+  // PPT file trên Drive (không phải Google Slides) → dùng preview của Drive
+  return mediaItemHTML('Slide trình bày',url,'presentation');
+}
+
 function mediaItemHTML(label,url,hint){
   if(!url)return '';
   const kind=detectKind(url,hint);
@@ -742,34 +773,45 @@ function openDetail(row){
   let viewer;
   if(multi){
     viewer=`<div class="spin360-badge">${ICONS.rotate} 360° · ${imgs.length} góc</div>
-      <div class="spinwrap" id="spinwrap" data-mode="seq">${imgs.map((u,i)=>`<img class="seq-img${i===0?' show':''}" data-i="${i}" src="${esc(u)}" alt="">`).join('')}</div>
+      <div class="spinwrap" id="spinwrap" data-mode="seq">${imgs.map((u,i)=>`<img class="seq-img${i===0?' show':''}" data-i="${i}" data-src="${esc(u)}" data-try="0" src="${esc(u)}" alt="" onerror="seqImgRetry(this)">`).join('')}</div>
       <div class="reflect"></div><div class="seqbar"><div class="fill" id="seqfill"></div></div>
-      <div class="drag-cue">${ICONS.drag} Kéo để xoay 360°</div>
-      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.dl} Thêm media</div>`;
+      <div class="drag-cue">${ICONS.drag} Tự xoay · kéo để điều khiển</div>
+      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else if(imgs.length===1){
-    viewer=`<div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" alt="${esc(p.name)}" onerror="this.classList.add('imgerr')"></div>
-      <div class="reflect"></div><div class="drag-cue">${ICONS.drag} Kéo để xoay sản phẩm</div>
-      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.dl} Thêm media</div>`;
+    viewer=`<div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" onerror="seqImgRetry(this)"></div>
+      <div class="reflect"></div><div class="drag-cue">${ICONS.drag} Tự xoay · kéo để điều khiển</div>
+      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else{
     viewer=`<div class="dropzone" onclick="pickFiles(event)">
         <div class="dz-ic">${ICONS.upload}</div>
-        <div class="dz-t">Kéo & thả ảnh, video hoặc tài liệu vào đây</div>
-        <div class="dz-s">Hoặc bấm để chọn · dán (Ctrl+V) cũng được. File sẽ tự tải lên Drive.</div>
+        <div class="dz-t">Kéo & thả ảnh, video, PDF hoặc PowerPoint vào đây</div>
+        <div class="dz-s">Hoặc bấm để chọn · dán ảnh (Ctrl+V). File tự tải lên Drive và vào đúng tab.</div>
       </div>`;
   }
-  const mediaCount=[p.ifu,p.brochure,p.video,p.presentation].filter(Boolean).length+(imgs.length?1:0);
   // Gallery nếu nhiều ảnh
   const galleryHTML=multi
     ? `<div class="gallery"><div class="swiper" id="gallerySwiper"><div class="swiper-wrapper">${imgs.map(u=>`<div class="swiper-slide"><img src="${esc(u)}" onclick="openLightbox('${esc(u)}')" loading="lazy"></div>`).join('')}</div><div class="swiper-button-next"></div><div class="swiper-button-prev"></div><div class="swiper-pagination"></div></div></div>`
     : '';
-  const mediaHTML=[
-    galleryHTML,
-    multi?'':mediaItemHTML('Ảnh sản phẩm',imgs[0],'image'),
-    mediaItemHTML('IFU — Hướng dẫn sử dụng',p.ifu,'pdf'),
-    mediaItemHTML('Brochure / Catalogue',p.brochure,'pdf'),
-    mediaItemHTML('Video',p.video,'video'),
-    mediaItemHTML('Presentation',p.presentation,'presentation'),
-  ].filter(Boolean).join('');
+
+  // ----- Xây danh sách tab động: mỗi loại media 1 tab riêng -----
+  const tabDefs=[
+    {id:'info', label:'Thông tin', icon:ICONS.info, on:true,
+     html:`<div class="block"><div class="bh"><div class="ic">${ICONS.feat}</div>Đặc tính & công nghệ chính</div>${blistHTML(p.features)}</div>
+        <div class="block"><div class="bh"><div class="ic">${ICONS.app}</div>Ứng dụng</div>${blistHTML(p.applications,'app')}</div>
+        <div class="block"><div class="bh"><div class="ic">${ICONS.fab}</div>Diễn giải FAB — Đặc tính → Lợi ích</div>${blistHTML(p.fab,'fab')}</div>
+        ${p.usp?`<div class="block"><div class="bh"><div class="ic">${ICONS.usp}</div>Lợi thế cạnh tranh</div><div class="usp">${esc(p.usp)}</div></div>`:''}
+        ${p.conceptLong?`<div class="block"><div class="bh"><div class="ic">${ICONS.concept}</div>Câu chuyện sản phẩm</div><div class="concept"><span>${esc(p.conceptLong)}</span></div></div>`:''}`}
+  ];
+  if(imgs.length) tabDefs.push({id:'img', label:'Hình ảnh', icon:ICONS.photo, count:imgs.length,
+     html: multi? galleryHTML : mediaItemHTML('Ảnh sản phẩm',imgs[0],'image')});
+  if(p.video) tabDefs.push({id:'video', label:'Video', icon:ICONS.vid, html: mediaItemHTML('Video sản phẩm',p.video,'video')});
+  if(p.presentation) tabDefs.push({id:'ppt', label:'Slide', icon:ICONS.ppt, html: presentationHTML(p.presentation)});
+  if(p.ifu) tabDefs.push({id:'ifu', label:'IFU', icon:ICONS.pdf, html: mediaItemHTML('IFU — Hướng dẫn sử dụng',p.ifu,'pdf')});
+  if(p.brochure) tabDefs.push({id:'brochure', label:'Brochure', icon:ICONS.pdf, html: mediaItemHTML('Brochure / Catalogue',p.brochure,'pdf')});
+
+  const tabsHTML=tabDefs.map((t,i)=>`<div class="tab ${i===0?'active':''}" onclick="switchTab(this,'tab-${t.id}')">${t.icon} ${t.label}${t.count?`<span class="badge">${t.count}</span>`:''}</div>`).join('');
+  const panesHTML=tabDefs.map((t,i)=>`<div class="pane ${i===0?'active':''}" id="tab-${t.id}">${t.html||`<div class="nomedia">${ICONS.media}<p>Chưa có nội dung.</p></div>`}</div>`).join('');
+
   document.getElementById('detailModal').innerHTML=`
     <div class="modal-top">
       <div class="modal-viewer">${viewer}</div>
@@ -782,22 +824,8 @@ function openDetail(row){
       <button class="modal-close" onclick="closeDetail()">${ICONS.close}</button>
       <button class="modal-edit" onclick="openEdit(${p._row})">${ICONS.edit} Sửa</button>
     </div>
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab(this,'tab-info')">${ICONS.info} Thông tin</div>
-      <div class="tab" onclick="switchTab(this,'tab-media')">${ICONS.media} Media & Tài liệu ${mediaCount?`<span class="badge">${mediaCount}</span>`:''}</div>
-    </div>
-    <div class="mbody">
-      <div class="pane active" id="tab-info">
-        <div class="block"><div class="bh"><div class="ic">${ICONS.feat}</div>Đặc tính & công nghệ chính</div>${blistHTML(p.features)}</div>
-        <div class="block"><div class="bh"><div class="ic">${ICONS.app}</div>Ứng dụng</div>${blistHTML(p.applications,'app')}</div>
-        <div class="block"><div class="bh"><div class="ic">${ICONS.fab}</div>Diễn giải FAB — Đặc tính → Lợi ích</div>${blistHTML(p.fab,'fab')}</div>
-        ${p.usp?`<div class="block"><div class="bh"><div class="ic">${ICONS.usp}</div>Lợi thế cạnh tranh</div><div class="usp">${esc(p.usp)}</div></div>`:''}
-        ${p.conceptLong?`<div class="block"><div class="bh"><div class="ic">${ICONS.concept}</div>Câu chuyện sản phẩm</div><div class="concept"><span>${esc(p.conceptLong)}</span></div></div>`:''}
-      </div>
-      <div class="pane" id="tab-media">
-        ${mediaHTML?`<div class="mediagrid">${mediaHTML}</div>`:`<div class="nomedia">${ICONS.media}<p>Sản phẩm này chưa có tài liệu/media.<br>Bấm <b>Sửa</b> để thêm link Drive.</p></div>`}
-      </div>
-    </div>`;
+    <div class="tabs">${tabsHTML}</div>
+    <div class="mbody">${panesHTML}</div>`;
   const m=document.getElementById('detailModal');m.scrollTop=0;
   document.getElementById('detailOverlay').classList.add('open');document.body.style.overflow='hidden';
   if(multi){ initSeq360(imgs.length); preloadSeq(imgs); }
@@ -808,24 +836,36 @@ function openDetail(row){
 
 /* ---------- 360° IMAGE-SEQUENCE (Sketchfab-style) ---------- */
 function preloadSeq(urls){urls.forEach(u=>{const i=new Image();i.src=u})}
+// Khi ảnh Drive lỗi (thumbnail bị chặn) → thử lần lượt các URL thay thế
+function seqImgRetry(img){
+  const src=img.getAttribute('data-src'); let t=parseInt(img.getAttribute('data-try')||'0',10);
+  if(t>=3){img.classList.add('imgerr');return}
+  img.setAttribute('data-try',t+1);
+  img.src=imgAltUrl(src,t);
+}
 function initSeq360(n){
   const w=document.getElementById('spinwrap');if(!w)return;
   const imgs=[...w.querySelectorAll('.seq-img')];
   const fill=document.getElementById('seqfill');
-  let frame=0, dragging=false, lx=0, auto;
+  let frame=0, dragging=false, lx=0, timer=null;
+  const FRAME_MS=550; // tốc độ tự chuyển: ~0.55s mỗi ảnh (từ từ)
   function show(f){
     f=((f%n)+n)%n; frame=f;
     imgs.forEach((im,i)=>im.classList.toggle('show',i===f));
     if(fill)fill.style.width=((f+1)/n*100)+'%';
   }
-  function autoSpin(){cancelAnimationFrame(auto);let acc=0;(function tick(){if(dragging)return;acc+=0.35;if(acc>=1){show(frame+1);acc=0}auto=requestAnimationFrame(tick)})()}
+  function autoSpin(){ stopAuto(); timer=setInterval(()=>{ if(!dragging) show(frame+1); }, FRAME_MS); }
+  function stopAuto(){ if(timer){clearInterval(timer);timer=null} }
   show(0);autoSpin();
-  function down(e){dragging=true;w.classList.add('dragging');cancelAnimationFrame(auto);const pt=e.touches?e.touches[0]:e;lx=pt.clientX;e.preventDefault()}
+  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;e.preventDefault()}
   function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const dx=pt.clientX-lx;const step=w.offsetWidth/n;if(Math.abs(dx)>=step){const adv=Math.round(dx/step);show(frame-adv);lx=pt.clientX}}
-  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging');setTimeout(()=>{if(!dragging)autoSpin()},1500)}
+  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')} // tiếp tục tự xoay ngay
   w.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   w.addEventListener('touchstart',down,{passive:false});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
+  // dọn timer khi đóng modal
+  _seqCleanup=stopAuto;
 }
+let _seqCleanup=null;
 let _gallerySwiper;
 function initGallery(){
   if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}}
@@ -889,36 +929,39 @@ async function handleFiles(files){
   if(_currentRow==null){toast('Hãy mở một sản phẩm trước khi thêm media',true);return}
   if(!USE_LIVE){toast('Cần kết nối Google Sheet để upload (USE_LIVE=true)',true);return}
   const p=PRODUCTS.find(x=>x._row===_currentRow);if(!p)return;
-  // map loại file -> cột; ảnh có thể nhiều (nối vào cột image để tạo 360)
-  const updates={}; // key -> [links]
+  const updates={}; // cột -> [links]
   let done=0;
   try{
     for(const f of files){
       done++;
       showUploading(`Đang tải lên ${done}/${files.length}…`,f.name);
-      const link=await uploadOne(f,p.name);
-      const k=fileKind(f);
-      const col={image:'image',video:'video',pdf:'ifu',presentation:'presentation',doc:'ifu',other:'ifu'}[k];
-      (updates[col]=updates[col]||[]).push(link);
+      const r=await uploadOne(f,p.name);
+      // ưu tiên kind backend trả về, fallback đoán từ file
+      const k=r.kind||fileKind(f);
+      const col={image:'image',video:'video',pdf:'ifu',presentation:'presentation',doc:'ifu',other:'ifu'}[k]||'ifu';
+      (updates[col]=updates[col]||[]).push(r.url);
     }
     showUploading('Đang lưu vào Sheet…','');
-    // gộp với dữ liệu hiện có
     const data={...p};delete data._row;
     Object.keys(updates).forEach(col=>{
       const existing=(data[col]||'').trim();
       const add=updates[col].join('\n');
       data[col]=existing?existing+'\n'+add:add;
     });
-    // chuyển bullet arrays về đúng định dạng (giữ nguyên — backend tự join)
     const res=await jsonp({action:'update',payload:JSON.stringify({_row:_currentRow,data})});
     if(!res||!res.ok)throw new Error(res&&res.error||'Lỗi ghi Sheet');
     hideUploading();
-    toast(`Đã thêm ${files.length} media`);
+    toast(`Đã thêm ${files.length} file`);
     await loadData(false);
     openDetail(_currentRow);
   }catch(err){
     hideUploading();
-    toast('Lỗi upload: '+(err.message||err),true);
+    const msg=String(err.message||err);
+    if(/CHƯA CẤP QUYỀN|DriveApp|permission|quyền/i.test(msg)){
+      toast('Backend chưa được cấp quyền Drive — xem hướng dẫn cấp quyền trong Code.gs (chạy hàm setup)',true);
+    }else{
+      toast('Lỗi upload: '+msg,true);
+    }
   }
 }
 function fileToBase64(f){
@@ -929,42 +972,36 @@ function fileToBase64(f){
     r.readAsDataURL(f);
   });
 }
-// upload qua POST (form-urlencoded) để tránh giới hạn độ dài URL của JSONP/GET
+// upload qua POST form-urlencoded (tránh giới hạn độ dài URL & CORS preflight)
 async function uploadOne(file,productName){
   const b64=await fileToBase64(file);
   const body=new URLSearchParams();
   body.set('action','upload');
   body.set('payload',JSON.stringify({filename:file.name,mime:file.type||'application/octet-stream',product:productName||'',data:b64}));
-  // KHÔNG set Content-Type thủ công → giữ "simple request", tránh CORS preflight với Apps Script
   const r=await fetch(API_URL,{method:'POST',body});
   const j=await r.json();
   if(!j||!j.ok||!j.url)throw new Error(j&&j.error||'Upload thất bại');
-  return j.url;
+  return j; // {url, kind, id, name}
 }
 
 /* ---------- DRAG-TO-ROTATE 3D in modal viewer ---------- */
 function initSpin(){
   const w=document.getElementById('spinwrap');if(!w)return;
-  let rx=-6, ry=0, dragging=false, lx=0, ly=0, idle;
+  let rx=-4, ry=0, dragging=false, lx=0, ly=0, raf, paused=false;
   function apply(){w.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`}
-  function autoIdle(){ // nhẹ nhàng lắc lư khi không tương tác
-    cancelAnimationFrame(idle);
-    let t=0;
+  function loop(){
+    cancelAnimationFrame(raf);
     (function tick(){
-      if(dragging)return;
-      t+=0.012; ry=ry*0.96+Math.sin(t)*0.6; rx=rx*0.96+(-6)*0.04;
-      apply(); idle=requestAnimationFrame(tick);
+      if(!dragging && !paused){ ry+=0.35; rx+=(-4-rx)*0.05; apply(); } // tự xoay liên tục, chậm
+      raf=requestAnimationFrame(tick);
     })();
   }
-  apply();autoIdle();
-  function down(e){dragging=true;w.classList.add('dragging');cancelAnimationFrame(idle);const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly=pt.clientY;e.preventDefault()}
+  apply();loop();
+  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly=pt.clientY;e.preventDefault()}
   function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;ry+=(pt.clientX-lx)*0.6;rx-=(pt.clientY-ly)*0.4;rx=Math.max(-50,Math.min(50,rx));lx=pt.clientX;ly=pt.clientY;apply()}
-  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging');autoIdle()}
+  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')}
   w.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   w.addEventListener('touchstart',down,{passive:false});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
-  // hover parallax nhẹ trên cả vùng viewer
-  const vp=w.closest('.modal-viewer');
-  vp.addEventListener('mousemove',e=>{if(dragging)return;const r=vp.getBoundingClientRect();const px=(e.clientX-r.left)/r.width-.5;rx=-6-(e.clientY-r.top<r.height/2?-4:4)*Math.abs((e.clientY-r.top)/r.height-.5)*2;ry=px*22;apply()});
 }
 
 function switchTab(el,id){
@@ -973,7 +1010,7 @@ function switchTab(el,id){
   body.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   body.querySelector('#'+id).classList.add('active');body.scrollTop=0;
 }
-function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_seqCleanup){_seqCleanup();_seqCleanup=null}if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
 function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
 
 /* ---------- EDIT ---------- */
