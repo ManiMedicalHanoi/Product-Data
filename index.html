@@ -252,6 +252,24 @@ img{max-width:100%;display:block}
 .gallery .swiper-pagination-bullet{background:#fff;opacity:.55}
 .gallery .swiper-pagination-bullet-active{background:var(--yellow);opacity:1}
 .modal-viewer .reflect{position:absolute;left:18%;right:18%;bottom:26px;height:34px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,48,71,.22),transparent 70%);filter:blur(8px)}
+/* ---- QUICK DROPZONE ---- */
+.dropzone{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--blue);cursor:pointer;transition:.2s}
+.dropzone .dz-ic{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.7);backdrop-filter:blur(6px);display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:.25s var(--ease)}
+.dropzone .dz-ic svg{width:26px;height:26px;color:var(--blue)}
+.dropzone .dz-t{font-size:13.5px;font-weight:700;color:var(--navy)}
+.dropzone .dz-s{font-size:11.5px;color:var(--muted);max-width:220px;line-height:1.4}
+.dropzone:hover .dz-ic{transform:translateY(-3px);background:#fff}
+.modal-viewer.dragover{outline:3px dashed var(--blue);outline-offset:-10px;background:linear-gradient(155deg,#dbe9fb,#cbddf3)!important}
+.modal-viewer.dragover .dropzone .dz-ic{transform:scale(1.12);background:var(--yellow)}
+.modal-viewer.dragover .dropzone .dz-ic svg{color:var(--navy)}
+.dz-mini{position:absolute;bottom:14px;right:14px;z-index:7;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid var(--line);color:var(--blue);font-size:11.5px;font-weight:700;padding:7px 13px;border-radius:30px;cursor:pointer;box-shadow:var(--shadow-sm);transition:.2s}
+.dz-mini:hover{border-color:var(--blue);background:#fff;transform:translateY(-1px)}
+.dz-mini svg{width:14px;height:14px}
+/* upload progress overlay */
+.uploading{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(240,247,255,.92);backdrop-filter:blur(4px);color:var(--navy)}
+.uploading .spin-ring{width:46px;height:46px;border:4px solid var(--lb);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite}
+.uploading .ut{font-size:13.5px;font-weight:700}
+.uploading .us{font-size:11.5px;color:var(--muted);max-width:240px;text-align:center}
 .modal-detail{padding:34px 36px 30px;display:flex;flex-direction:column}
 .modal-detail .dgroup{display:inline-flex;align-self:flex-start;align-items:center;gap:7px;background:var(--pale);color:var(--blue);font-size:11.5px;font-weight:700;letter-spacing:.5px;padding:6px 14px;border-radius:30px;margin-bottom:14px}
 .modal-detail h2{font-size:clamp(23px,3vw,32px);font-weight:850;color:var(--navy);line-height:1.12;letter-spacing:-.8px;margin-bottom:14px;white-space:pre-line}
@@ -397,9 +415,9 @@ img{max-width:100%;display:block}
 <header class="hero" id="top">
   <div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
   <div class="hero-inner">
-    <div class="eyebrow"><span class="pulse"></span> Product Concept Hub · Live từ Google Sheet</div>
+    <div class="eyebrow"><span class="pulse"></span> Cập nhật trực tiếp từ Google Sheet</div>
     <h1>Danh mục sản phẩm<br><span class="grad">Nha khoa MANI</span></h1>
-    <p class="lede">Khám phá toàn bộ dòng sản phẩm nội nha, mũi khoan, vật liệu phục hồi & chỉ khâu — với hình ảnh xoay 3D, tài liệu IFU, brochure và video xem trực tiếp ngay trên trình duyệt.</p>
+    <p class="lede">Trọn bộ giải pháp nội nha, mũi khoan, vật liệu phục hồi & chỉ khâu — tất cả trong một nơi.</p>
     <div class="cta-row">
       <button class="btn-cta primary" onclick="document.getElementById('catalog').scrollIntoView({behavior:'smooth'})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -485,10 +503,11 @@ const ICONS={
   edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>',
   rotate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8M3 3v5h5"/></svg>',
-  drag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>'
+  drag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>'
 };
 
-let PRODUCTS=[], activeGroup='all', searchTerm='';
+let PRODUCTS=[], activeGroup='all', searchTerm='', _currentRow=null;
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- DRIVE URL HELPERS ---------- */
@@ -717,6 +736,7 @@ function mediaItemHTML(label,url,hint){
 }
 function openDetail(row){
   const p=PRODUCTS.find(x=>x._row===row);if(!p)return;
+  _currentRow=row;
   const imgs=splitImages(p.image);
   const multi=imgs.length>=2;
   let viewer;
@@ -724,12 +744,18 @@ function openDetail(row){
     viewer=`<div class="spin360-badge">${ICONS.rotate} 360° · ${imgs.length} góc</div>
       <div class="spinwrap" id="spinwrap" data-mode="seq">${imgs.map((u,i)=>`<img class="seq-img${i===0?' show':''}" data-i="${i}" src="${esc(u)}" alt="">`).join('')}</div>
       <div class="reflect"></div><div class="seqbar"><div class="fill" id="seqfill"></div></div>
-      <div class="drag-cue">${ICONS.drag} Kéo để xoay 360°</div>`;
+      <div class="drag-cue">${ICONS.drag} Kéo để xoay 360°</div>
+      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.dl} Thêm media</div>`;
   }else if(imgs.length===1){
     viewer=`<div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" alt="${esc(p.name)}" onerror="this.classList.add('imgerr')"></div>
-      <div class="reflect"></div><div class="drag-cue">${ICONS.drag} Kéo để xoay sản phẩm</div>`;
+      <div class="reflect"></div><div class="drag-cue">${ICONS.drag} Kéo để xoay sản phẩm</div>
+      <div class="dz-mini" onclick="pickFiles(event)">${ICONS.dl} Thêm media</div>`;
   }else{
-    viewer=`<div class="heroph">${ICONS.photo}<span>Chưa có ảnh sản phẩm</span></div>`;
+    viewer=`<div class="dropzone" onclick="pickFiles(event)">
+        <div class="dz-ic">${ICONS.upload}</div>
+        <div class="dz-t">Kéo & thả ảnh, video hoặc tài liệu vào đây</div>
+        <div class="dz-s">Hoặc bấm để chọn · dán (Ctrl+V) cũng được. File sẽ tự tải lên Drive.</div>
+      </div>`;
   }
   const mediaCount=[p.ifu,p.brochure,p.video,p.presentation].filter(Boolean).length+(imgs.length?1:0);
   // Gallery nếu nhiều ảnh
@@ -765,8 +791,8 @@ function openDetail(row){
         <div class="block"><div class="bh"><div class="ic">${ICONS.feat}</div>Đặc tính & công nghệ chính</div>${blistHTML(p.features)}</div>
         <div class="block"><div class="bh"><div class="ic">${ICONS.app}</div>Ứng dụng</div>${blistHTML(p.applications,'app')}</div>
         <div class="block"><div class="bh"><div class="ic">${ICONS.fab}</div>Diễn giải FAB — Đặc tính → Lợi ích</div>${blistHTML(p.fab,'fab')}</div>
-        ${p.usp?`<div class="block"><div class="bh"><div class="ic">${ICONS.usp}</div>USP — Điểm bán độc nhất</div><div class="usp"><span class="ul">Unique Selling Point</span>${esc(p.usp)}</div></div>`:''}
-        ${p.conceptLong?`<div class="block"><div class="bh"><div class="ic">${ICONS.concept}</div>Concept (Dài)</div><div class="concept"><span>${esc(p.conceptLong)}</span></div></div>`:''}
+        ${p.usp?`<div class="block"><div class="bh"><div class="ic">${ICONS.usp}</div>Lợi thế cạnh tranh</div><div class="usp">${esc(p.usp)}</div></div>`:''}
+        ${p.conceptLong?`<div class="block"><div class="bh"><div class="ic">${ICONS.concept}</div>Câu chuyện sản phẩm</div><div class="concept"><span>${esc(p.conceptLong)}</span></div></div>`:''}
       </div>
       <div class="pane" id="tab-media">
         ${mediaHTML?`<div class="mediagrid">${mediaHTML}</div>`:`<div class="nomedia">${ICONS.media}<p>Sản phẩm này chưa có tài liệu/media.<br>Bấm <b>Sửa</b> để thêm link Drive.</p></div>`}
@@ -777,6 +803,7 @@ function openDetail(row){
   if(multi){ initSeq360(imgs.length); preloadSeq(imgs); }
   else if(imgs.length===1){ initSpin(); }
   if(multi){ setTimeout(()=>initGallery(),120); }
+  initDropzone();
 }
 
 /* ---------- 360° IMAGE-SEQUENCE (Sketchfab-style) ---------- */
@@ -812,6 +839,109 @@ function initGallery(){
   });
 }
 
+/* ---------- QUICK MEDIA UPLOAD (drag/drop · paste · pick) ---------- */
+let _fileInput;
+function ensureFileInput(){
+  if(_fileInput)return _fileInput;
+  _fileInput=document.createElement('input');
+  _fileInput.type='file';_fileInput.multiple=true;
+  _fileInput.accept='image/*,video/*,application/pdf,.ppt,.pptx,.doc,.docx';
+  _fileInput.style.display='none';
+  _fileInput.addEventListener('change',()=>{if(_fileInput.files.length)handleFiles([..._fileInput.files]);_fileInput.value=''});
+  document.body.appendChild(_fileInput);
+  return _fileInput;
+}
+function pickFiles(e){if(e){e.stopPropagation()}ensureFileInput().click()}
+function initDropzone(){
+  const vp=document.querySelector('.modal-viewer');if(!vp||vp._dz)return;vp._dz=true;
+  let depth=0;
+  vp.addEventListener('dragenter',e=>{e.preventDefault();depth++;vp.classList.add('dragover')});
+  vp.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy'});
+  vp.addEventListener('dragleave',e=>{e.preventDefault();if(--depth<=0){depth=0;vp.classList.remove('dragover')}});
+  vp.addEventListener('drop',e=>{e.preventDefault();depth=0;vp.classList.remove('dragover');const fs=[...(e.dataTransfer.files||[])];if(fs.length)handleFiles(fs)});
+}
+// paste ảnh từ clipboard khi modal mở
+document.addEventListener('paste',e=>{
+  if(!document.getElementById('detailOverlay').classList.contains('open'))return;
+  const items=[...(e.clipboardData?.items||[])];
+  const files=items.filter(i=>i.kind==='file').map(i=>i.getAsFile()).filter(Boolean);
+  if(files.length){e.preventDefault();handleFiles(files)}
+});
+
+function fileKind(f){
+  const t=f.type||'';
+  if(t.startsWith('image/'))return 'image';
+  if(t.startsWith('video/'))return 'video';
+  if(t==='application/pdf')return 'pdf';
+  if(/presentation|powerpoint/.test(t))return 'presentation';
+  if(/word|document/.test(t))return 'doc';
+  return 'other';
+}
+function showUploading(msg,sub){
+  const vp=document.querySelector('.modal-viewer');if(!vp)return;
+  let o=vp.querySelector('.uploading');
+  if(!o){o=document.createElement('div');o.className='uploading';vp.appendChild(o)}
+  o.innerHTML=`<div class="spin-ring"></div><div class="ut">${esc(msg)}</div><div class="us">${esc(sub||'')}</div>`;
+}
+function hideUploading(){const o=document.querySelector('.modal-viewer .uploading');if(o)o.remove()}
+
+async function handleFiles(files){
+  if(_currentRow==null){toast('Hãy mở một sản phẩm trước khi thêm media',true);return}
+  if(!USE_LIVE){toast('Cần kết nối Google Sheet để upload (USE_LIVE=true)',true);return}
+  const p=PRODUCTS.find(x=>x._row===_currentRow);if(!p)return;
+  // map loại file -> cột; ảnh có thể nhiều (nối vào cột image để tạo 360)
+  const updates={}; // key -> [links]
+  let done=0;
+  try{
+    for(const f of files){
+      done++;
+      showUploading(`Đang tải lên ${done}/${files.length}…`,f.name);
+      const link=await uploadOne(f,p.name);
+      const k=fileKind(f);
+      const col={image:'image',video:'video',pdf:'ifu',presentation:'presentation',doc:'ifu',other:'ifu'}[k];
+      (updates[col]=updates[col]||[]).push(link);
+    }
+    showUploading('Đang lưu vào Sheet…','');
+    // gộp với dữ liệu hiện có
+    const data={...p};delete data._row;
+    Object.keys(updates).forEach(col=>{
+      const existing=(data[col]||'').trim();
+      const add=updates[col].join('\n');
+      data[col]=existing?existing+'\n'+add:add;
+    });
+    // chuyển bullet arrays về đúng định dạng (giữ nguyên — backend tự join)
+    const res=await jsonp({action:'update',payload:JSON.stringify({_row:_currentRow,data})});
+    if(!res||!res.ok)throw new Error(res&&res.error||'Lỗi ghi Sheet');
+    hideUploading();
+    toast(`Đã thêm ${files.length} media`);
+    await loadData(false);
+    openDetail(_currentRow);
+  }catch(err){
+    hideUploading();
+    toast('Lỗi upload: '+(err.message||err),true);
+  }
+}
+function fileToBase64(f){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(String(r.result).split(',')[1]);
+    r.onerror=()=>rej(new Error('Đọc file lỗi'));
+    r.readAsDataURL(f);
+  });
+}
+// upload qua POST (form-urlencoded) để tránh giới hạn độ dài URL của JSONP/GET
+async function uploadOne(file,productName){
+  const b64=await fileToBase64(file);
+  const body=new URLSearchParams();
+  body.set('action','upload');
+  body.set('payload',JSON.stringify({filename:file.name,mime:file.type||'application/octet-stream',product:productName||'',data:b64}));
+  // KHÔNG set Content-Type thủ công → giữ "simple request", tránh CORS preflight với Apps Script
+  const r=await fetch(API_URL,{method:'POST',body});
+  const j=await r.json();
+  if(!j||!j.ok||!j.url)throw new Error(j&&j.error||'Upload thất bại');
+  return j.url;
+}
+
 /* ---------- DRAG-TO-ROTATE 3D in modal viewer ---------- */
 function initSpin(){
   const w=document.getElementById('spinwrap');if(!w)return;
@@ -843,7 +973,7 @@ function switchTab(el,id){
   body.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
   body.querySelector('#'+id).classList.add('active');body.scrollTop=0;
 }
-function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
 function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
 
 /* ---------- EDIT ---------- */
@@ -871,8 +1001,8 @@ function openEdit(row){
       <div class="field"><label>Đặc tính & công nghệ <span class="opt">(mỗi dòng 1 ý)</span></label><textarea id="f_features" rows="4">${esc(L(p.features))}</textarea></div>
       <div class="field"><label>Ứng dụng <span class="opt">(mỗi dòng 1 ý)</span></label><textarea id="f_apps" rows="3">${esc(L(p.applications))}</textarea></div>
       <div class="field"><label>Diễn giải FAB <span class="opt">(mỗi dòng 1 ý)</span></label><textarea id="f_fab" rows="4">${esc(L(p.fab))}</textarea></div>
-      <div class="field"><label>USP</label><textarea id="f_usp" rows="2">${esc(p.usp)}</textarea></div>
-      <div class="field"><label>Concept (Dài)</label><textarea id="f_concept" rows="3">${esc(p.conceptLong)}</textarea></div>
+      <div class="field"><label>Lợi thế cạnh tranh</label><textarea id="f_usp" rows="2">${esc(p.usp)}</textarea></div>
+      <div class="field"><label>Câu chuyện sản phẩm</label><textarea id="f_concept" rows="3">${esc(p.conceptLong)}</textarea></div>
       <div class="fgl">Media & Tài liệu (dán link Google Drive)</div>
       <div class="field"><label>Ảnh <span class="opt">— dán 1 link, hoặc nhiều link (cách nhau bằng dấu phẩy / xuống dòng) để bật xoay 360°</span></label><textarea id="f_image" rows="2" placeholder="https://drive.google.com/file/d/.../view&#10;https://drive.google.com/file/d/.../view  ← thêm để xoay 360°">${esc(p.image)}</textarea></div>
       <div class="field"><label>IFU</label><input id="f_ifu" value="${esc(p.ifu)}"></div>
