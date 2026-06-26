@@ -127,8 +127,10 @@ img{max-width:100%;display:block}
   -webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);
   padding:14px 0;box-shadow:0 4px 20px rgba(7,30,60,.04);
 }
-.filterbar .wrap{display:flex;align-items:center;gap:14px}
-.chips{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:2px;flex:1}
+.filterbar .wrap{display:flex;flex-direction:column;gap:10px}
+.fbar-top{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.fbar-label{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none;padding:2px}
 .chips::-webkit-scrollbar{display:none}
 .chip{
   white-space:nowrap;padding:9px 17px;border-radius:30px;font-size:13px;font-weight:600;cursor:pointer;
@@ -173,10 +175,10 @@ img{max-width:100%;display:block}
 .pcard .stage::after{content:'';position:absolute;left:18%;right:18%;bottom:18px;height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,40,70,.16),transparent 72%);filter:blur(6px);transition:.5s}
 .pcard:hover .stage::after{bottom:13px;left:24%;right:24%}
 .pcard .obj{
-  width:80%;height:80%;display:grid;place-items:center;
+  width:92%;height:90%;display:grid;place-items:center;
   transition:transform .2s var(--ease);will-change:transform;position:relative;
 }
-.pcard .obj img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 14px 22px rgba(0,40,70,.18));transition:.4s}
+.pcard .obj img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 14px 22px rgba(0,40,70,.18));transition:.4s}
 .pcard:hover .obj img{filter:drop-shadow(0 20px 30px rgba(0,40,70,.26))}
 .pcard .obj .ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--blue);opacity:.4}
 .pcard .obj .ph svg{width:46px;height:46px}
@@ -412,7 +414,14 @@ img{max-width:100%;display:block}
 /* ============ LIGHTBOX ============ */
 .lightbox{position:fixed;inset:0;z-index:400;display:none;background:rgba(4,12,24,.94);align-items:center;justify-content:center;padding:40px;cursor:zoom-out;backdrop-filter:blur(6px)}
 .lightbox.open{display:flex;animation:ovfade .25s}
-.lightbox img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:modalIn .4s var(--ease-spring)}
+.lightbox img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:modalIn .4s var(--ease-spring);transition:transform .2s ease;cursor:zoom-in}
+.lb-zoomctl{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:401}
+.lb-zoomctl button{width:44px;height:44px;border-radius:12px;border:none;background:rgba(255,255,255,.14);color:#fff;font-size:20px;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(8px);transition:.2s}
+.lb-zoomctl button:hover{background:rgba(255,255,255,.26)}
+/* nút zoom trên viewer */
+.modal-viewer .zoom-btn{position:absolute;top:16px;right:16px;z-index:5;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.92);backdrop-filter:blur(6px);color:var(--navy);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:.2s var(--ease)}
+.modal-viewer .zoom-btn:hover{background:#fff;border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+.modal-viewer .zoom-btn svg{width:18px;height:18px}
 
 /* ============ TOAST ============ */
 .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--navy);color:#fff;padding:15px 26px;border-radius:16px;font-size:14px;font-weight:600;z-index:500;box-shadow:var(--shadow-xl);display:flex;align-items:center;gap:11px;opacity:0;transition:.4s var(--ease-spring);max-width:90vw}
@@ -627,6 +636,9 @@ img{max-width:100%;display:block}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
     <input id="search" type="text" placeholder="Tìm sản phẩm, công nghệ, ứng dụng…">
   </div>
+  <a class="nav-btn icon" href="https://docs.google.com/spreadsheets/d/1IQmW_8kD-YqlxVR_FVvmyYvtZwMLBmvuMIfySbgKmAo/edit?gid=1616534638#gid=1616534638" target="_blank" rel="noopener" title="Mở Google Sheet nguồn dữ liệu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></svg>
+  </a>
   <button class="nav-btn icon" id="refreshBtn" title="Làm mới dữ liệu" onclick="loadData(true)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg>
   </button>
@@ -639,7 +651,7 @@ img{max-width:100%;display:block}
 <header class="hero" id="top">
   <div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
   <div class="hero-inner">
-    <div class="eyebrow"><span class="pulse"></span> Cập nhật trực tiếp từ Google Sheet</div>
+    <div class="eyebrow"><span class="pulse"></span> Danh mục sản phẩm MANI Medical Hanoi</div>
     <h1>Danh mục sản phẩm<br><span class="grad">Nha khoa MANI</span></h1>
     <p class="lede">Trọn bộ giải pháp nội nha, mũi khoan, vật liệu phục hồi & chỉ khâu — tất cả trong một nơi.</p>
     <div class="cta-row">
@@ -660,11 +672,14 @@ img{max-width:100%;display:block}
 <!-- FILTER BAR -->
 <div class="filterbar" id="catalog">
   <div class="wrap">
-    <div class="chips" id="chips"></div>
-    <div class="conn">
-      <span class="dot loading" id="connDot"></span>
-      <span id="connText">Đang kết nối…</span>
+    <div class="fbar-top">
+      <span class="fbar-label">Lọc theo nhóm</span>
+      <div class="conn">
+        <span class="dot loading" id="connDot"></span>
+        <span id="connText">Đang kết nối…</span>
+      </div>
     </div>
+    <div class="chips" id="chips"></div>
   </div>
 </div>
 
@@ -697,7 +712,7 @@ img{max-width:100%;display:block}
 <!-- MODALS -->
 <div class="overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()"><div class="modal" id="detailModal"></div></div>
 <div class="overlay" id="editOverlay" onclick="if(event.target===this)closeEdit()"><div class="modal" id="editModal" style="max-width:760px"></div></div>
-<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')"><img id="lightboxImg" src="" alt=""></div>
+<div class="lightbox" id="lightbox" onclick="if(event.target.id==='lightbox')this.classList.remove('open')"><img id="lightboxImg" src="" alt="" onclick="event.stopPropagation();lbZoom(0.5)" onwheel="event.preventDefault();lbZoom(event.deltaY<0?0.3:-0.3)"><div class="lb-zoomctl"><button onclick="event.stopPropagation();lbZoom(-0.4)">−</button><button onclick="event.stopPropagation();lbZoom(0.4)">+</button></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -732,7 +747,8 @@ const ICONS={
   play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
   pause:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>',
   chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>',
-  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>'
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>',
+  zoom:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>'
 };
 
 let PRODUCTS=[], activeGroup='all', searchTerm='', _currentRow=null;
@@ -1255,12 +1271,14 @@ function openDetail(row){
   let viewer;
   if(multi){
     viewer=`<div class="spin360-badge">${ICONS.rotate} 360° · ${imgs.length} góc</div>
+      <button class="zoom-btn" onclick="zoomCurrent()" title="Phóng to">${ICONS.zoom}</button>
       <div class="spinwrap" id="spinwrap" data-mode="seq">${imgs.map((u,i)=>`<img class="seq-img${i===0?' show':''}" data-i="${i}" data-src="${esc(u)}" data-try="0" src="${esc(u)}" alt="" onerror="seqImgRetry(this)">`).join('')}</div>
       <div class="seqbar"><div class="fill" id="seqfill"></div></div>
       <div class="drag-cue">${ICONS.drag} Tự xoay · kéo để điều khiển</div>
       <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else if(imgs.length===1){
-    viewer=`<div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" onerror="seqImgRetry(this)"></div>
+    viewer=`<button class="zoom-btn" onclick="zoomCurrent()" title="Phóng to">${ICONS.zoom}</button>
+      <div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" onerror="seqImgRetry(this)"></div>
       <div class="drag-cue">${ICONS.drag} Kéo để di chuyển ảnh</div>
       <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else{
@@ -1603,7 +1621,23 @@ function setupVideoSequence(pane){
   }).catch(()=>{ /* nếu bị chặn, người dùng bấm play thủ công */ });
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_storyCtl){_storyCtl.stop();_storyCtl=null}if(_seqCleanup){_seqCleanup();_seqCleanup=null}if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
-function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
+function openLightbox(src){
+  const img=document.getElementById('lightboxImg');
+  img.src=src; img.style.transform='scale(1)'; _lbScale=1;
+  document.getElementById('lightbox').classList.add('open');
+}
+// phóng to ảnh đang hiển thị trong viewer (ảnh đơn hoặc khung 360 hiện tại)
+function zoomCurrent(){
+  const w=document.getElementById('spinwrap');if(!w)return;
+  let img=w.querySelector('.seq-img.show')||w.querySelector('img');
+  if(img&&img.src) openLightbox(img.src);
+}
+let _lbScale=1;
+function lbZoom(delta){
+  _lbScale=Math.max(1,Math.min(5,_lbScale+delta));
+  const img=document.getElementById('lightboxImg');
+  img.style.transform=`scale(${_lbScale})`;
+}
 
 /* ---------- EDIT ---------- */
 function openEdit(row){
