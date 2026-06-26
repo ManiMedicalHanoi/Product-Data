@@ -411,6 +411,52 @@ img{max-width:100%;display:block}
 .foot .fmeta{font-size:12.5px;color:#8fb0cc;text-align:right;line-height:1.7}
 .foot .fmeta a{color:var(--yellow);font-weight:600}
 
+/* ===================== STORYTELLING ===================== */
+.story{display:flex;flex-direction:column;gap:0}
+/* hero mở đầu */
+.story-hero{padding:6px 0 22px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.story-hero .sh-kick{font-size:11.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.story-hero .sh-kick::before{content:'';width:26px;height:3px;border-radius:2px;background:var(--yellow)}
+.story-hero .sh-tagline{font-size:clamp(22px,3vw,30px);font-weight:850;letter-spacing:-.6px;color:var(--navy);line-height:1.15;margin-bottom:12px}
+.story-hero .sh-type{font-size:15px;color:#52677d;line-height:1.6}
+/* narrative */
+.story-narrative{position:relative;background:linear-gradient(135deg,var(--navy),#0a4d6b);color:#eaf3fb;border-radius:18px;padding:24px 26px 24px 64px;margin-bottom:28px;overflow:hidden;box-shadow:var(--shadow-md)}
+.story-narrative .sn-mark{position:absolute;left:22px;top:24px;width:28px;height:28px;opacity:.9}
+.story-narrative .sn-mark svg{width:28px;height:28px;color:var(--yellow)}
+.story-narrative p{font-size:16.5px;line-height:1.7;font-weight:500;font-style:italic}
+.story-narrative::after{content:'';position:absolute;right:-30px;bottom:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,225,0,.14),transparent 70%)}
+/* section chung */
+.story-sec{margin-bottom:30px}
+.ss-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.ss-head .ss-step{flex-shrink:0;width:38px;height:38px;border-radius:12px;background:var(--pale);border:1.5px solid var(--lb);color:var(--blue);font-size:14px;font-weight:850;display:grid;place-items:center}
+.ss-head b{font-size:16px;color:var(--navy);font-weight:800;display:block;letter-spacing:-.2px}
+.ss-head small{font-size:12.5px;color:var(--muted);display:block;margin-top:2px}
+/* lợi ích */
+.benefit-grid{display:grid;gap:11px}
+.benefit{display:flex;gap:13px;align-items:flex-start;background:#f0fbf4;border:1px solid #cdeed9;border-radius:14px;padding:15px 17px;transition:.25s var(--ease)}
+.benefit:hover{border-color:#9ed9b4;transform:translateY(-2px);box-shadow:0 8px 22px rgba(47,158,94,.12)}
+.benefit .bf-ic{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--green);display:grid;place-items:center;margin-top:1px}
+.benefit .bf-ic svg{width:15px;height:15px;color:#fff}
+.benefit b{display:block;font-size:14.5px;color:#1a6b3d;font-weight:800;margin-bottom:3px;letter-spacing:.2px}
+.benefit span{font-size:14px;color:#2f4a3a;line-height:1.55}
+/* công nghệ */
+.tech-list{display:grid;gap:9px}
+.tech{display:flex;gap:13px;align-items:flex-start;background:var(--pale);border:1px solid var(--line);border-radius:13px;padding:13px 16px;transition:.2s var(--ease)}
+.tech:hover{border-color:var(--lb);transform:translateX(3px)}
+.tech .tech-n{flex-shrink:0;width:23px;height:23px;border-radius:7px;background:var(--blue);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+.tech p{font-size:14px;color:#2a3b4d;line-height:1.55}
+/* ứng dụng chips */
+.app-chips{display:flex;flex-wrap:wrap;gap:9px}
+.app-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--lb);border-radius:30px;padding:9px 15px 9px 12px;font-size:13.5px;font-weight:600;color:var(--navy);transition:.2s var(--ease)}
+.app-chip:hover{background:var(--pale);border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.app-chip svg{width:15px;height:15px;color:var(--blue);flex-shrink:0}
+/* USP kết */
+.story-usp{position:relative;background:linear-gradient(135deg,#fff8d6,#fffdf0);border:1.5px solid #ffe97a;border-radius:18px;padding:22px 24px;overflow:hidden}
+.story-usp::before{content:'★';position:absolute;top:-18px;right:6px;font-size:96px;color:rgba(255,209,0,.18);font-weight:900}
+.story-usp .su-label{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#a8860a;margin-bottom:10px}
+.story-usp .su-label svg{width:14px;height:14px}
+.story-usp p{font-size:16.5px;line-height:1.65;font-weight:700;color:var(--navy);position:relative;z-index:1}
+
 /* ===================== RESPONSIVE ===================== */
 /* Tablet */
 @media(max-width:900px){
@@ -486,6 +532,15 @@ img{max-width:100%;display:block}
   .block .bh{font-size:12px}
   .blist li{font-size:13.5px;padding:11px 13px}
   .usp{font-size:14.5px;padding:18px 18px}
+  /* story mobile */
+  .story-hero .sh-tagline{font-size:22px}
+  .story-narrative{padding:20px 20px 20px 54px}
+  .story-narrative .sn-mark{left:18px;top:20px;width:24px;height:24px}
+  .story-narrative .sn-mark svg{width:24px;height:24px}
+  .story-narrative p{font-size:15px}
+  .ss-head .ss-step{width:34px;height:34px;font-size:13px}
+  .ss-head b{font-size:15px}
+  .story-usp p{font-size:15px}
   .mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:64vh;min-height:400px}
   .gallery .swiper{height:300px}
   .mimg{max-height:380px}
@@ -888,15 +943,10 @@ function oneVideoHTML(url,idx,total){
   }else if(isVimeo(url)){
     viewer=`<iframe class="mframe vid" src="${esc(vimeoEmbed(url))}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
   }else if(id){
-    // Drive: ưu tiên thẻ <video> HTML5 (phát trực tiếp, không bị 403 như /preview).
-    // Nếu lỗi (đang xử lý / chặn) → tự fallback sang iframe /preview.
-    const direct=`https://drive.google.com/uc?export=download&id=${id}`;
+    // Drive KHÔNG cho stream qua thẻ <video> (chặn hotlink). Cách ổn định nhất là iframe /preview.
     const prev=`https://drive.google.com/file/d/${id}/preview`;
-    viewer=`<video class="mvideo" data-video controls playsinline preload="metadata"
-              data-fallback="${esc(prev)}" onerror="videoFallback(this)">
-              <source src="${esc(direct)}" type="video/mp4">
-            </video>
-            <div class="vid-note">${ICONS.info} Video mới tải lên có thể cần vài phút để Drive xử lý. Nếu chưa xem được, hãy đợi rồi tải lại trang.</div>`;
+    viewer=`<iframe class="mframe vid" src="${esc(prev)}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>
+            <div class="vid-note">${ICONS.info} Video Drive mới tải lên cần vài phút để xử lý. Để phát mượt & nhanh hơn, nên dùng <b>YouTube</b> (chưa công khai cũng được — đặt "Không công khai/Unlisted") rồi dán link vào ô Video.</div>`;
   }else{
     viewer=`<video class="mvideo" data-video controls playsinline preload="metadata"><source src="${esc(url)}"></video>`;
   }
@@ -981,6 +1031,70 @@ function mediaItemHTML(label,url,hint){
       </div>
     </div>${viewer}</div>`;
 }
+/* ====== STORYTELLING layout cho tab Thông tin ======
+   Mạch: Đây là gì → Câu chuyện/lý do → Công nghệ → Lợi ích → Ứng dụng → Vì sao chọn */
+function storyHTML(p){
+  const feats=p.features||[], apps=p.applications||[], fab=p.fab||[];
+  let h='<div class="story">';
+
+  // 1. MỞ ĐẦU — đây là gì (type) + tagline lớn, dẫn dắt
+  h+=`<div class="story-hero">
+        <div class="sh-kick">${esc(p.group)}</div>
+        ${p.tagline?`<div class="sh-tagline">${esc(p.tagline)}</div>`:''}
+        ${p.type?`<p class="sh-type">${esc(p.type)}</p>`:''}
+      </div>`;
+
+  // 2. CÂU CHUYỆN — concept dài kể như narrative (nếu có)
+  if(p.conceptLong){
+    h+=`<div class="story-narrative">
+          <div class="sn-mark">${ICONS.concept}</div>
+          <p>${esc(p.conceptLong)}</p>
+        </div>`;
+  }
+
+  // 3. LỢI ÍCH (FAB) — phần "vì sao nó tốt", đặt nổi bật sớm vì đây là điều người đọc quan tâm
+  if(fab.length){
+    h+=`<div class="story-sec">
+          <div class="ss-head"><span class="ss-step">01</span><div><b>Vì sao chọn sản phẩm này</b><small>Đặc tính chuyển thành lợi ích thực tế</small></div></div>
+          <div class="benefit-grid">${fab.map(x=>{
+            // tách "TIÊU ĐỀ → diễn giải" nếu có dấu →
+            const parts=x.split(/→(.+)/);
+            if(parts.length>=2){
+              return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><b>${esc(parts[0].trim())}</b><span>${esc(parts[1].trim())}</span></div></div>`;
+            }
+            return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><span>${esc(x)}</span></div></div>`;
+          }).join('')}</div>
+        </div>`;
+  }
+
+  // 4. CÔNG NGHỆ CỐT LÕI (features)
+  if(feats.length){
+    h+=`<div class="story-sec">
+          <div class="ss-head"><span class="ss-step">02</span><div><b>Công nghệ & đặc tính cốt lõi</b><small>Những gì làm nên sản phẩm</small></div></div>
+          <div class="tech-list">${feats.map((x,i)=>`<div class="tech"><span class="tech-n">${i+1}</span><p>${esc(x)}</p></div>`).join('')}</div>
+        </div>`;
+  }
+
+  // 5. ỨNG DỤNG (chips)
+  if(apps.length){
+    h+=`<div class="story-sec">
+          <div class="ss-head"><span class="ss-step">03</span><div><b>Chỉ định & ứng dụng lâm sàng</b><small>Dùng trong những trường hợp nào</small></div></div>
+          <div class="app-chips">${apps.map(x=>`<div class="app-chip">${ICONS.app}<span>${esc(x)}</span></div>`).join('')}</div>
+        </div>`;
+  }
+
+  // 6. KẾT — USP (điểm chốt, vì sao vượt trội)
+  if(p.usp){
+    h+=`<div class="story-usp">
+          <span class="su-label">${ICONS.usp} Điểm khác biệt</span>
+          <p>${esc(p.usp)}</p>
+        </div>`;
+  }
+
+  h+='</div>';
+  return h;
+}
+
 function openDetail(row){
   const p=PRODUCTS.find(x=>x._row===row);if(!p)return;
   _currentRow=row;
@@ -1011,12 +1125,7 @@ function openDetail(row){
 
   // ----- Xây danh sách tab động: mỗi loại media 1 tab riêng -----
   const tabDefs=[
-    {id:'info', label:'Thông tin', icon:ICONS.info, on:true,
-     html:`<div class="block"><div class="bh"><div class="ic">${ICONS.feat}</div>Đặc tính & công nghệ chính</div>${blistHTML(p.features)}</div>
-        <div class="block"><div class="bh"><div class="ic">${ICONS.app}</div>Ứng dụng</div>${blistHTML(p.applications,'app')}</div>
-        <div class="block"><div class="bh"><div class="ic">${ICONS.fab}</div>Diễn giải FAB — Đặc tính → Lợi ích</div>${blistHTML(p.fab,'fab')}</div>
-        ${p.usp?`<div class="block"><div class="bh"><div class="ic">${ICONS.usp}</div>Lợi thế cạnh tranh</div><div class="usp">${esc(p.usp)}</div></div>`:''}
-        ${p.conceptLong?`<div class="block"><div class="bh"><div class="ic">${ICONS.concept}</div>Câu chuyện sản phẩm</div><div class="concept"><span>${esc(p.conceptLong)}</span></div></div>`:''}`}
+    {id:'info', label:'Thông tin', icon:ICONS.info, on:true, html: storyHTML(p)}
   ];
   if(imgs.length) tabDefs.push({id:'img', label:'Hình ảnh', icon:ICONS.photo, count:imgs.length,
      html: multi? galleryHTML : mediaItemHTML('Ảnh sản phẩm',imgs[0],'image')});
