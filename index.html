@@ -413,9 +413,9 @@ img{max-width:100%;display:block}
 
 /* ===================== STORY CAROUSEL ===================== */
 .story-carousel{position:relative}
-.story-track{position:relative;transition:height .4s var(--ease);overflow:hidden}
-.story-slide{position:absolute;inset:0 0 auto 0;width:100%;opacity:0;visibility:hidden;transform:translateX(28px) scale(.985);transition:opacity .45s var(--ease),transform .45s var(--ease)}
-.story-slide.active{position:relative;opacity:1;visibility:visible;transform:none}
+.story-track{position:relative;transition:height .4s var(--ease);overflow:hidden;min-height:120px}
+.story-slide{position:absolute;inset:0 0 auto 0;width:100%;opacity:0;visibility:hidden;pointer-events:none;transform:translateX(28px) scale(.985);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.story-slide.active{position:relative;opacity:1;visibility:visible;pointer-events:auto;transform:none}
 /* thẻ block */
 .slide-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md)}
 .slide-card .sc-head{display:flex;align-items:center;gap:15px;padding:20px 22px;border-bottom:1px solid var(--line);position:relative}
@@ -520,27 +520,28 @@ img{max-width:100%;display:block}
   .grid{grid-template-columns:1fr;gap:18px}
   .pcard .stage{height:210px}
 
-  /* MODAL full-screen feel */
-  .overlay{padding:0;align-items:stretch}
-  .modal{border-radius:20px 20px 0 0;max-width:100%;min-height:100vh;margin:0;align-self:flex-end}
-  @keyframes modalIn{from{transform:translateY(60px);opacity:.6}to{transform:translateY(0);opacity:1}}
-  .modal-viewer{min-height:260px;padding:26px}
-  .modal-viewer .spinwrap img,.modal-viewer .seq-img{max-height:200px}
+  /* MODAL full-screen feel — cuộn nội bộ trong modal để không bị đơ */
+  .overlay{padding:0;align-items:stretch;overflow:hidden}
+  .modal{border-radius:0;max-width:100%;width:100%;height:100dvh;max-height:100dvh;margin:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;animation:modalIn .35s var(--ease)}
+  @keyframes modalIn{from{transform:translateY(40px);opacity:.5}to{transform:translateY(0);opacity:1}}
+  .modal-top{display:block}
+  .modal-viewer{min-height:240px;height:auto;padding:24px;touch-action:pan-y}
+  .modal-viewer .spinwrap img,.modal-viewer .seq-img{max-height:190px}
   .modal-viewer .dz-mini{bottom:12px;right:12px;font-size:11px;padding:6px 11px}
-  .modal-detail{padding:22px 20px 18px}
-  .modal-detail h2{font-size:21px}
+  .modal-detail{padding:22px 18px 18px}
+  .modal-detail h2{font-size:20px}
   .modal-detail .dtype{font-size:13px}
   .modal-detail .dtag .v{font-size:16px}
-  .modal-close{top:12px;right:12px;width:36px;height:36px}
-  .modal-edit{top:12px;right:56px;height:36px;padding:0 12px;font-size:12px}
+  .modal-close{top:12px;right:12px;width:38px;height:38px}
+  .modal-edit{top:12px;right:58px;height:38px;padding:0 13px;font-size:12.5px}
 
-  /* TABS scroll ngang */
-  .tabs{padding:4px 16px 0;gap:2px}
-  .tab{padding:13px 11px 12px;font-size:13px}
+  /* TABS — sticky trong modal, bấm được, cuộn ngang */
+  .tabs{position:sticky;top:0;z-index:9;padding:4px 14px 0;gap:2px;background:#fff;-webkit-overflow-scrolling:touch}
+  .tab{padding:14px 12px 13px;font-size:13.5px;flex-shrink:0}
   .tab .badge{min-width:16px;height:16px;font-size:10px}
 
-  /* BODY + media to hơn dễ đọc */
-  .mbody{padding:20px 16px 26px;max-height:none}
+  /* BODY — không cuộn riêng (để modal cuộn 1 mạch), bỏ max-height */
+  .mbody{padding:18px 14px 40px;max-height:none;overflow:visible}
   .block .bh{font-size:12px}
   .blist li{font-size:13.5px;padding:11px 13px}
   .usp{font-size:14.5px;padding:18px 18px}
@@ -1136,8 +1137,10 @@ function initStoryCarousel(){
   function render(){
     slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
     dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
-    const ah=slides[cur].firstElementChild.offsetHeight;
-    track.style.height=ah+'px';
+    // slide active là position:relative nên track tự cao; chỉ set height để animate mượt nếu đo được
+    const ac=slides[cur].firstElementChild;
+    const ah=ac?ac.offsetHeight:0;
+    if(ah>0){track.style.height=ah+'px';} else {track.style.height='auto';}
   }
   function go(i,manual){cur=(i%total+total)%total;render();if(manual){restart()}}
   function next(){go(cur+1)}
@@ -1243,7 +1246,7 @@ function initSeq360(n){
   const w=document.getElementById('spinwrap');if(!w)return;
   const imgs=[...w.querySelectorAll('.seq-img')];
   const fill=document.getElementById('seqfill');
-  let frame=0, dragging=false, lx=0, timer=null;
+  let frame=0, dragging=false, lx=0, ly0=0, hMove=false, timer=null;
   const FRAME_MS=900; // tốc độ tự chuyển: ~0.9s mỗi ảnh (chậm rãi, dễ nhìn)
   function show(f){
     f=((f%n)+n)%n; frame=f;
@@ -1253,11 +1256,15 @@ function initSeq360(n){
   function autoSpin(){ stopAuto(); timer=setInterval(()=>{ if(!dragging) show(frame+1); }, FRAME_MS); }
   function stopAuto(){ if(timer){clearInterval(timer);timer=null} }
   show(0);autoSpin();
-  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;e.preventDefault()}
-  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const dx=pt.clientX-lx;const step=w.offsetWidth/n;if(Math.abs(dx)>=step){const adv=Math.round(dx/step);show(frame-adv);lx=pt.clientX}}
-  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')} // tiếp tục tự xoay ngay
+  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly0=pt.clientY;hMove=false}
+  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const dx=pt.clientX-lx;const dy=pt.clientY-(ly0||pt.clientY);
+    // nếu vuốt dọc nhiều hơn ngang → để trang cuộn, không xoay
+    if(!hMove && Math.abs(dy)>Math.abs(dx)){dragging=false;return}
+    hMove=true; if(e.cancelable)e.preventDefault(); // chỉ chặn khi đã xác định là kéo ngang
+    const step=w.offsetWidth/n;if(Math.abs(dx)>=step){const adv=Math.round(dx/step);show(frame-adv);lx=pt.clientX}}
+  function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')}
   w.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
-  w.addEventListener('touchstart',down,{passive:false});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
+  w.addEventListener('touchstart',down,{passive:true});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
   // dọn timer khi đóng modal
   _seqCleanup=stopAuto;
 }
@@ -1420,7 +1427,7 @@ async function uploadOne(file,productName){
 /* ---------- DRAG-TO-ROTATE 3D in modal viewer ---------- */
 function initSpin(){
   const w=document.getElementById('spinwrap');if(!w)return;
-  let rx=-4, ry=0, dragging=false, lx=0, ly=0, raf, paused=false;
+  let rx=-4, ry=0, dragging=false, lx=0, ly=0, raf, paused=false, hMove=false;
   function apply(){w.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`}
   function loop(){
     cancelAnimationFrame(raf);
@@ -1430,11 +1437,14 @@ function initSpin(){
     })();
   }
   apply();loop();
-  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly=pt.clientY;e.preventDefault()}
-  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;ry+=(pt.clientX-lx)*0.6;rx-=(pt.clientY-ly)*0.4;rx=Math.max(-50,Math.min(50,rx));lx=pt.clientX;ly=pt.clientY;apply()}
+  function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly=pt.clientY;hMove=false}
+  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const dx=pt.clientX-lx,dy=pt.clientY-ly;
+    if(!hMove && e.touches && Math.abs(dy)>Math.abs(dx)){dragging=false;return} // vuốt dọc → cho trang cuộn
+    if(e.touches){hMove=true;if(e.cancelable)e.preventDefault()}
+    ry+=dx*0.6;rx-=dy*0.4;rx=Math.max(-50,Math.min(50,rx));lx=pt.clientX;ly=pt.clientY;apply()}
   function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')}
   w.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
-  w.addEventListener('touchstart',down,{passive:false});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
+  w.addEventListener('touchstart',down,{passive:true});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
 }
 
 function switchTab(el,id){
@@ -1445,16 +1455,18 @@ function switchTab(el,id){
   const pane=body.querySelector('#'+id);pane.classList.add('active');
   // dừng mọi video đang phát ở tab khác
   modal.querySelectorAll('video[data-video]').forEach(v=>{try{v.pause()}catch(e){}});
-  // cuộn nội dung + cả overlay lên đầu để thấy ngay (không phải kéo xuống)
-  body.scrollTop=0;
+  // Xác định element cuộn: mobile → modal tự cuộn; desktop → overlay cuộn
   const ov=document.getElementById('detailOverlay');
-  // Với tab media (không phải info) → cuộn để khung media nổi lên đầu màn hình
+  const scroller = (modal.scrollHeight>modal.clientHeight+4) ? modal : ov;
+  // cuộn để tabs (sticky) hoặc khung media nổi lên đầu
   requestAnimationFrame(()=>{
-    if(ov.scrollHeight<=ov.clientHeight) return;
-    const anchor = (id==='info') ? modal.querySelector('.tabs') : (pane.querySelector('.mcard, .gallery, .media-stack') || modal.querySelector('.tabs'));
+    if(scroller.scrollHeight<=scroller.clientHeight+4) return;
+    const tabsEl=modal.querySelector('.tabs');
+    const anchor = (id==='info') ? tabsEl : (pane.querySelector('.mcard, .gallery, .media-stack, .story-carousel') || tabsEl);
     if(anchor){
-      const top=ov.scrollTop + anchor.getBoundingClientRect().top - (modal.querySelector('.tabs').offsetHeight + 70);
-      ov.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+      const cur=scroller.scrollTop;
+      const top=cur + anchor.getBoundingClientRect().top - (scroller===modal ? (tabsEl.offsetHeight+6) : (tabsEl.offsetHeight+70));
+      scroller.scrollTo({top:Math.max(0,top),behavior:'smooth'});
     }
   });
   // Auto-play khi mở tab Video
