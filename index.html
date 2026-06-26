@@ -362,6 +362,11 @@ img{max-width:100%;display:block}
 .mbtn-lg svg{width:14px;height:14px}
 .ppt-card .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c}
 .ppt-card .ppt-frame-wrap .mframe.ppt{position:absolute;inset:0;width:100%;height:100%;min-height:0}
+.mvideo{width:100%;max-height:72vh;background:#000;display:block;aspect-ratio:16/9}
+.vid-note{display:flex;align-items:flex-start;gap:8px;padding:11px 16px;font-size:12px;color:var(--muted);background:#fafcff;border-top:1px solid var(--line);line-height:1.45}
+.vid-note svg{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:1px}
+.media-stack{display:flex;flex-direction:column;gap:20px}
+.media-stack .mcard{margin:0}
 .mimg{width:100%;max-height:560px;object-fit:contain;background:#0c1a2c;display:block;cursor:zoom-in}
 .nomedia{text-align:center;padding:60px 24px;color:var(--muted)}
 .nomedia svg{width:52px;height:52px;opacity:.3;margin-bottom:14px}
@@ -865,28 +870,90 @@ function blistHTML(arr,cls){
   return `<ul class="blist ${cls||''}">${arr.map((x,i)=>`<li><span class="num">${i+1}</span><span>${esc(x)}</span></li>`).join('')}</ul>`;
 }
 /* UI xem slide trình bày — dùng Google Slides embed (có điều hướng slide tích hợp) + nút mở rộng */
-function presentationHTML(url){
-  if(!url) return '';
+/* Tách nhiều link (phẩy / xuống dòng / |) cho video, slide, pdf... */
+function splitLinks(raw){
+  if(!raw) return [];
+  return String(raw).split(/[\n,|]+/).map(s=>s.trim()).filter(Boolean);
+}
+function isVimeo(url){return /vimeo\.com/.test(url||'')}
+function vimeoEmbed(url){const m=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);return m?`https://player.vimeo.com/video/${m[1]}`:url}
+
+/* ----- VIDEO: hỗ trợ YouTube, Vimeo, Drive (thử <video> trực tiếp, fallback iframe) ----- */
+function oneVideoHTML(url,idx,total){
   const id=driveId(url);
-  const isGSlides=/\/presentation\/d\//.test(url);
-  if(isGSlides&&id){
-    const embed=`https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=60000`;
-    const presentUrl=`https://docs.google.com/presentation/d/${id}/present`;
+  const label = total>1 ? `Video ${idx+1}/${total}` : 'Video sản phẩm';
+  let viewer;
+  if(isYouTube(url)){
+    viewer=`<iframe class="mframe vid" src="${esc(ytEmbed(url))}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+  }else if(isVimeo(url)){
+    viewer=`<iframe class="mframe vid" src="${esc(vimeoEmbed(url))}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+  }else if(id){
+    // Drive: ưu tiên thẻ <video> HTML5 (phát trực tiếp, không bị 403 như /preview).
+    // Nếu lỗi (đang xử lý / chặn) → tự fallback sang iframe /preview.
+    const direct=`https://drive.google.com/uc?export=download&id=${id}`;
+    const prev=`https://drive.google.com/file/d/${id}/preview`;
+    viewer=`<video class="mvideo" data-video controls playsinline preload="metadata"
+              data-fallback="${esc(prev)}" onerror="videoFallback(this)">
+              <source src="${esc(direct)}" type="video/mp4">
+            </video>
+            <div class="vid-note">${ICONS.info} Video mới tải lên có thể cần vài phút để Drive xử lý. Nếu chưa xem được, hãy đợi rồi tải lại trang.</div>`;
+  }else{
+    viewer=`<video class="mvideo" data-video controls playsinline preload="metadata"><source src="${esc(url)}"></video>`;
+  }
+  return `<div class="mcard vid-card" data-vidcard>
+    <div class="mch">
+      <div class="mci vid">${ICONS.vid}</div>
+      <div class="mct"><b>${esc(label)}</b><small>Video</small></div>
+      <div class="mca">
+        <a class="mbtn" href="${esc(openUrl(url))}" target="_blank" title="Mở tab mới">${ICONS.ext}</a>
+        <a class="mbtn" href="${esc(dlUrl(url))}" target="_blank" title="Tải về">${ICONS.dl}</a>
+      </div>
+    </div>${viewer}</div>`;
+}
+function videoHTML(raw){
+  const urls=splitLinks(raw);if(!urls.length)return '';
+  return `<div class="media-stack" data-autostack="video">${urls.map((u,i)=>oneVideoHTML(u,i,urls.length)).join('')}</div>`;
+}
+// Khi <video> Drive lỗi → thay bằng iframe preview
+function videoFallback(v){
+  const fb=v.getAttribute('data-fallback');if(!fb)return;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<iframe class="mframe vid" src="${fb}" allow="autoplay;fullscreen" allowfullscreen frameborder="0"></iframe>`;
+  v.replaceWith(wrap.firstChild);
+}
+
+/* ----- SLIDE: nhiều bài, tự chạy chậm ----- */
+function oneSlideHTML(url,idx,total){
+  const id=driveId(url);
+  const isGS=/\/presentation\/d\//.test(url);
+  const label= total>1 ? `Slide ${idx+1}/${total}` : 'Slide trình bày';
+  if(isGS&&id){
+    // delayms=5000 + loop → tự chuyển slide chậm (~5s/slide)
+    const embed=`https://docs.google.com/presentation/d/${id}/embed?start=true&loop=true&delayms=5000`;
+    const present=`https://docs.google.com/presentation/d/${id}/present`;
     return `<div class="mcard ppt-card">
       <div class="mch">
         <div class="mci ppt">${ICONS.ppt}</div>
-        <div class="mct"><b>Slide trình bày</b><small>Bấm "Trình chiếu" để xem từng slide như slideshow, hoặc dùng ◀ ▶ ngay trong khung</small></div>
+        <div class="mct"><b>${esc(label)}</b><small>Tự chạy ~5s/slide · dùng ◀ ▶ để tự điều khiển</small></div>
         <div class="mca">
-          <a class="mbtn-lg" href="${presentUrl}" target="_blank" title="Mở chế độ trình chiếu (slideshow)">${ICONS.play}<span>Trình chiếu</span></a>
-          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở trong Google Slides">${ICONS.ext}</a>
+          <a class="mbtn-lg" href="${present}" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play}<span>Trình chiếu</span></a>
+          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở Google Slides">${ICONS.ext}</a>
         </div>
       </div>
-      <div class="ppt-frame-wrap">
-        <iframe class="mframe ppt" src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe>
-      </div>
+      <div class="ppt-frame-wrap"><iframe class="mframe ppt" data-slide src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe></div>
     </div>`;
   }
-  return mediaItemHTML('Slide trình bày',url,'presentation');
+  return mediaItemHTML(label,url,'presentation');
+}
+function presentationHTML(raw){
+  const urls=splitLinks(raw);if(!urls.length)return '';
+  return `<div class="media-stack">${urls.map((u,i)=>oneSlideHTML(u,i,urls.length)).join('')}</div>`;
+}
+
+/* ----- PDF/Tài liệu nhiều bản ----- */
+function docsHTML(raw,label,hint){
+  const urls=splitLinks(raw);if(!urls.length)return '';
+  return `<div class="media-stack">${urls.map((u,i)=>mediaItemHTML(urls.length>1?`${label} ${i+1}`:label,u,hint)).join('')}</div>`;
 }
 
 function mediaItemHTML(label,url,hint){
@@ -953,10 +1020,10 @@ function openDetail(row){
   ];
   if(imgs.length) tabDefs.push({id:'img', label:'Hình ảnh', icon:ICONS.photo, count:imgs.length,
      html: multi? galleryHTML : mediaItemHTML('Ảnh sản phẩm',imgs[0],'image')});
-  if(p.video) tabDefs.push({id:'video', label:'Video', icon:ICONS.vid, html: mediaItemHTML('Video sản phẩm',p.video,'video')});
-  if(p.presentation) tabDefs.push({id:'ppt', label:'Slide', icon:ICONS.ppt, html: presentationHTML(p.presentation)});
-  if(p.ifu) tabDefs.push({id:'ifu', label:'IFU', icon:ICONS.pdf, html: mediaItemHTML('IFU — Hướng dẫn sử dụng',p.ifu,'pdf')});
-  if(p.brochure) tabDefs.push({id:'brochure', label:'Brochure', icon:ICONS.pdf, html: mediaItemHTML('Brochure / Catalogue',p.brochure,'pdf')});
+  { const vs=splitLinks(p.video); if(vs.length) tabDefs.push({id:'video', label:'Video', icon:ICONS.vid, count:vs.length>1?vs.length:0, html: videoHTML(p.video)}); }
+  { const ss=splitLinks(p.presentation); if(ss.length) tabDefs.push({id:'ppt', label:'Slide', icon:ICONS.ppt, count:ss.length>1?ss.length:0, html: presentationHTML(p.presentation)}); }
+  { const fs=splitLinks(p.ifu); if(fs.length) tabDefs.push({id:'ifu', label:'IFU', icon:ICONS.pdf, count:fs.length>1?fs.length:0, html: docsHTML(p.ifu,'IFU — Hướng dẫn sử dụng','pdf')}); }
+  { const bs=splitLinks(p.brochure); if(bs.length) tabDefs.push({id:'brochure', label:'Brochure', icon:ICONS.pdf, count:bs.length>1?bs.length:0, html: docsHTML(p.brochure,'Brochure / Catalogue','pdf')}); }
 
   const tabsHTML=tabDefs.map((t,i)=>`<div class="tab ${i===0?'active':''}" onclick="switchTab(this,'tab-${t.id}')">${t.icon} ${t.label}${t.count?`<span class="badge">${t.count}</span>`:''}</div>`).join('');
   const panesHTML=tabDefs.map((t,i)=>`<div class="pane ${i===0?'active':''}" id="tab-${t.id}">${t.html||`<div class="nomedia">${ICONS.media}<p>Chưa có nội dung.</p></div>`}</div>`).join('');
@@ -1193,9 +1260,42 @@ function initSpin(){
 
 function switchTab(el,id){
   el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
-  const body=el.closest('.modal').querySelector('.mbody');
+  const modal=el.closest('.modal');
+  const body=modal.querySelector('.mbody');
   body.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  body.querySelector('#'+id).classList.add('active');body.scrollTop=0;
+  const pane=body.querySelector('#'+id);pane.classList.add('active');
+  // dừng mọi video đang phát ở tab khác
+  modal.querySelectorAll('video[data-video]').forEach(v=>{try{v.pause()}catch(e){}});
+  // cuộn nội dung + cả overlay lên đầu để thấy ngay (không phải kéo xuống)
+  body.scrollTop=0;
+  const ov=document.getElementById('detailOverlay');
+  // Với tab media (không phải info) → cuộn để khung media nổi lên đầu màn hình
+  requestAnimationFrame(()=>{
+    if(ov.scrollHeight<=ov.clientHeight) return;
+    const anchor = (id==='info') ? modal.querySelector('.tabs') : (pane.querySelector('.mcard, .gallery, .media-stack') || modal.querySelector('.tabs'));
+    if(anchor){
+      const top=ov.scrollTop + anchor.getBoundingClientRect().top - (modal.querySelector('.tabs').offsetHeight + 70);
+      ov.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+    }
+  });
+  // Auto-play khi mở tab Video
+  if(id==='video'){ setupVideoSequence(pane); }
+}
+
+/* Phát video tuần tự: video đầu tự play, xong tự chuyển video kế */
+function setupVideoSequence(pane){
+  const vids=[...pane.querySelectorAll('video[data-video]')];
+  if(!vids.length)return;
+  vids.forEach((v,i)=>{
+    v.onended=()=>{ const nx=vids[i+1]; if(nx){ nx.scrollIntoView({behavior:'smooth',block:'center'}); nx.play().catch(()=>{});} };
+  });
+  // tự phát video đầu (trình duyệt yêu cầu muted để autoplay không bị chặn)
+  const first=vids[0];
+  first.muted=true;
+  first.play().then(()=>{
+    // bật tiếng lại sau khi đã play (một số trình duyệt cho phép)
+    setTimeout(()=>{try{first.muted=false}catch(e){}},300);
+  }).catch(()=>{ /* nếu bị chặn, người dùng bấm play thủ công */ });
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_seqCleanup){_seqCleanup();_seqCleanup=null}if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
 function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
@@ -1229,10 +1329,10 @@ function openEdit(row){
       <div class="field"><label>Câu chuyện sản phẩm</label><textarea id="f_concept" rows="3">${esc(p.conceptLong)}</textarea></div>
       <div class="fgl">Media & Tài liệu (dán link Google Drive)</div>
       <div class="field"><label>Ảnh <span class="opt">— dán 1 link, hoặc nhiều link (cách nhau bằng dấu phẩy / xuống dòng) để bật xoay 360°</span></label><textarea id="f_image" rows="2" placeholder="https://drive.google.com/file/d/.../view&#10;https://drive.google.com/file/d/.../view  ← thêm để xoay 360°">${esc(p.image)}</textarea></div>
-      <div class="field"><label>IFU</label><input id="f_ifu" value="${esc(p.ifu)}"></div>
-      <div class="field"><label>Brochure</label><input id="f_brochure" value="${esc(p.brochure)}"></div>
-      <div class="field"><label>Video</label><input id="f_video" value="${esc(p.video)}" placeholder="Link Drive hoặc YouTube"></div>
-      <div class="field"><label>Presentation</label><input id="f_presentation" value="${esc(p.presentation)}"></div>
+      <div class="field"><label>Video <span class="opt">— 1 hoặc nhiều link (mỗi dòng 1 link). YouTube / Vimeo / Drive</span></label><textarea id="f_video" rows="2" placeholder="https://youtu.be/...&#10;https://drive.google.com/file/d/.../view">${esc(p.video)}</textarea></div>
+      <div class="field"><label>Slide trình bày <span class="opt">— 1 hoặc nhiều link Google Slides (mỗi dòng 1)</span></label><textarea id="f_presentation" rows="2" placeholder="https://docs.google.com/presentation/d/.../edit">${esc(p.presentation)}</textarea></div>
+      <div class="field"><label>IFU <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_ifu" rows="2">${esc(p.ifu)}</textarea></div>
+      <div class="field"><label>Brochure <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_brochure" rows="2">${esc(p.brochure)}</textarea></div>
     </div>
     <div class="mfoot">
       <button class="btn ghost" onclick="closeEdit()">Huỷ</button>
