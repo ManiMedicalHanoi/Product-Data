@@ -411,51 +411,63 @@ img{max-width:100%;display:block}
 .foot .fmeta{font-size:12.5px;color:#8fb0cc;text-align:right;line-height:1.7}
 .foot .fmeta a{color:var(--yellow);font-weight:600}
 
-/* ===================== STORYTELLING ===================== */
-.story{display:flex;flex-direction:column;gap:0}
-/* hero mở đầu */
-.story-hero{padding:6px 0 22px;border-bottom:1px solid var(--line);margin-bottom:24px}
-.story-hero .sh-kick{font-size:11.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:9px}
-.story-hero .sh-kick::before{content:'';width:26px;height:3px;border-radius:2px;background:var(--yellow)}
-.story-hero .sh-tagline{font-size:clamp(22px,3vw,30px);font-weight:850;letter-spacing:-.6px;color:var(--navy);line-height:1.15;margin-bottom:12px}
-.story-hero .sh-type{font-size:15px;color:#52677d;line-height:1.6}
-/* narrative */
-.story-narrative{position:relative;background:linear-gradient(135deg,var(--navy),#0a4d6b);color:#eaf3fb;border-radius:18px;padding:24px 26px 24px 64px;margin-bottom:28px;overflow:hidden;box-shadow:var(--shadow-md)}
-.story-narrative .sn-mark{position:absolute;left:22px;top:24px;width:28px;height:28px;opacity:.9}
-.story-narrative .sn-mark svg{width:28px;height:28px;color:var(--yellow)}
-.story-narrative p{font-size:16.5px;line-height:1.7;font-weight:500;font-style:italic}
-.story-narrative::after{content:'';position:absolute;right:-30px;bottom:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,225,0,.14),transparent 70%)}
-/* section chung */
-.story-sec{margin-bottom:30px}
-.ss-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.ss-head .ss-step{flex-shrink:0;width:38px;height:38px;border-radius:12px;background:var(--pale);border:1.5px solid var(--lb);color:var(--blue);font-size:14px;font-weight:850;display:grid;place-items:center}
-.ss-head b{font-size:16px;color:var(--navy);font-weight:800;display:block;letter-spacing:-.2px}
-.ss-head small{font-size:12.5px;color:var(--muted);display:block;margin-top:2px}
-/* lợi ích */
+/* ===================== STORY CAROUSEL ===================== */
+.story-carousel{position:relative}
+.story-track{position:relative;transition:height .4s var(--ease);overflow:hidden}
+.story-slide{position:absolute;inset:0 0 auto 0;width:100%;opacity:0;visibility:hidden;transform:translateX(28px) scale(.985);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+.story-slide.active{position:relative;opacity:1;visibility:visible;transform:none}
+/* thẻ block */
+.slide-card{background:#fff;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md)}
+.slide-card .sc-head{display:flex;align-items:center;gap:15px;padding:20px 22px;border-bottom:1px solid var(--line);position:relative}
+.slide-card .sc-ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex-shrink:0}
+.slide-card .sc-ic svg{width:23px;height:23px}
+.slide-card .sc-ti{flex:1;min-width:0}
+.slide-card .sc-kick{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:3px;opacity:.85}
+.slide-card .sc-head h3{font-size:19px;font-weight:850;color:var(--navy);letter-spacing:-.4px;line-height:1.2}
+.slide-card .sc-count{font-size:22px;font-weight:850;color:var(--line);flex-shrink:0;letter-spacing:-1px}
+.slide-card .sc-count span{font-size:13px;color:#cfd9e8}
+.slide-card .sc-body{padding:22px}
+/* accent màu theo chapter */
+.accent-navy .sc-ic{background:linear-gradient(135deg,var(--navy),#0a4d6b)}.accent-navy .sc-ic svg{color:var(--yellow)}.accent-navy .sc-kick{color:var(--navy)}.accent-navy{border-top:4px solid var(--navy)}
+.accent-green .sc-ic{background:var(--green)}.accent-green .sc-ic svg{color:#fff}.accent-green .sc-kick{color:var(--green)}.accent-green{border-top:4px solid var(--green)}
+.accent-blue .sc-ic{background:var(--blue)}.accent-blue .sc-ic svg{color:#fff}.accent-blue .sc-kick{color:var(--blue)}.accent-blue{border-top:4px solid var(--blue)}
+.accent-gold .sc-ic{background:var(--yellow)}.accent-gold .sc-ic svg{color:var(--navy)}.accent-gold .sc-kick{color:#a8860a}.accent-gold{border-top:4px solid var(--yellow)}
+/* nội dung trong chapter */
+.ch-lead{font-size:15.5px;color:#52677d;line-height:1.6;margin-bottom:16px}
+.ch-narrative{position:relative;background:linear-gradient(135deg,var(--navy),#0a4d6b);color:#eaf3fb;border-radius:14px;padding:20px 22px 20px 56px;overflow:hidden}
+.ch-narrative>svg{position:absolute;left:20px;top:21px;width:24px;height:24px;color:var(--yellow)}
+.ch-narrative p{font-size:16px;line-height:1.7;font-weight:500;font-style:italic}
+.ch-usp{font-size:17px;line-height:1.65;font-weight:700;color:var(--navy)}
 .benefit-grid{display:grid;gap:11px}
-.benefit{display:flex;gap:13px;align-items:flex-start;background:#f0fbf4;border:1px solid #cdeed9;border-radius:14px;padding:15px 17px;transition:.25s var(--ease)}
-.benefit:hover{border-color:#9ed9b4;transform:translateY(-2px);box-shadow:0 8px 22px rgba(47,158,94,.12)}
+.benefit{display:flex;gap:13px;align-items:flex-start;background:#f0fbf4;border:1px solid #cdeed9;border-radius:13px;padding:14px 16px}
 .benefit .bf-ic{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:var(--green);display:grid;place-items:center;margin-top:1px}
 .benefit .bf-ic svg{width:15px;height:15px;color:#fff}
 .benefit b{display:block;font-size:14.5px;color:#1a6b3d;font-weight:800;margin-bottom:3px;letter-spacing:.2px}
 .benefit span{font-size:14px;color:#2f4a3a;line-height:1.55}
-/* công nghệ */
 .tech-list{display:grid;gap:9px}
-.tech{display:flex;gap:13px;align-items:flex-start;background:var(--pale);border:1px solid var(--line);border-radius:13px;padding:13px 16px;transition:.2s var(--ease)}
-.tech:hover{border-color:var(--lb);transform:translateX(3px)}
+.tech{display:flex;gap:13px;align-items:flex-start;background:var(--pale);border:1px solid var(--line);border-radius:12px;padding:13px 16px}
 .tech .tech-n{flex-shrink:0;width:23px;height:23px;border-radius:7px;background:var(--blue);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;margin-top:1px}
 .tech p{font-size:14px;color:#2a3b4d;line-height:1.55}
-/* ứng dụng chips */
 .app-chips{display:flex;flex-wrap:wrap;gap:9px}
-.app-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--lb);border-radius:30px;padding:9px 15px 9px 12px;font-size:13.5px;font-weight:600;color:var(--navy);transition:.2s var(--ease)}
-.app-chip:hover{background:var(--pale);border-color:var(--blue);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.app-chip{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--lb);border-radius:30px;padding:9px 15px 9px 12px;font-size:13.5px;font-weight:600;color:var(--navy)}
 .app-chip svg{width:15px;height:15px;color:var(--blue);flex-shrink:0}
-/* USP kết */
-.story-usp{position:relative;background:linear-gradient(135deg,#fff8d6,#fffdf0);border:1.5px solid #ffe97a;border-radius:18px;padding:22px 24px;overflow:hidden}
-.story-usp::before{content:'★';position:absolute;top:-18px;right:6px;font-size:96px;color:rgba(255,209,0,.18);font-weight:900}
-.story-usp .su-label{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#a8860a;margin-bottom:10px}
-.story-usp .su-label svg{width:14px;height:14px}
-.story-usp p{font-size:16.5px;line-height:1.65;font-weight:700;color:var(--navy);position:relative;z-index:1}
+/* progress bar */
+.story-progress{height:3px;background:var(--line);border-radius:3px;margin:16px 0 0;overflow:hidden}
+.story-progress .sp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--yellow));border-radius:3px}
+/* nav */
+.story-nav{display:flex;align-items:center;gap:12px;margin-top:14px}
+.sn-arrow{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:.2s var(--ease)}
+.sn-arrow:hover{border-color:var(--blue);color:var(--blue);background:var(--pale);transform:translateY(-1px)}
+.sn-arrow svg{width:18px;height:18px}
+.story-dots{flex:1;display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.story-dot{height:8px;width:8px;border-radius:20px;border:none;background:#d2dded;cursor:pointer;padding:0;transition:.3s var(--ease);position:relative}
+.story-dot:hover{background:var(--lb)}
+.story-dot.active{width:28px;background:var(--blue)}
+.story-dot span{position:absolute;bottom:140%;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s}
+.story-dot:hover span{opacity:1}
+.sn-play{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--navy);color:#fff;cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:.2s var(--ease)}
+.sn-play:hover{background:var(--blue)}
+.sn-play svg{width:17px;height:17px}
 
 /* ===================== RESPONSIVE ===================== */
 /* Tablet */
@@ -532,15 +544,18 @@ img{max-width:100%;display:block}
   .block .bh{font-size:12px}
   .blist li{font-size:13.5px;padding:11px 13px}
   .usp{font-size:14.5px;padding:18px 18px}
-  /* story mobile */
-  .story-hero .sh-tagline{font-size:22px}
-  .story-narrative{padding:20px 20px 20px 54px}
-  .story-narrative .sn-mark{left:18px;top:20px;width:24px;height:24px}
-  .story-narrative .sn-mark svg{width:24px;height:24px}
-  .story-narrative p{font-size:15px}
-  .ss-head .ss-step{width:34px;height:34px;font-size:13px}
-  .ss-head b{font-size:15px}
-  .story-usp p{font-size:15px}
+  /* story carousel mobile */
+  .slide-card .sc-head{padding:16px 18px;gap:12px}
+  .slide-card .sc-ic{width:40px;height:40px}
+  .slide-card .sc-head h3{font-size:16.5px}
+  .slide-card .sc-count{font-size:18px}
+  .slide-card .sc-body{padding:18px}
+  .ch-narrative{padding:18px 18px 18px 50px}
+  .ch-narrative>svg{left:17px;top:19px;width:22px;height:22px}
+  .ch-narrative p{font-size:15px}
+  .ch-usp{font-size:15.5px}
+  .story-dot.active{width:24px}
+  .story-dot span{display:none}
   .mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:64vh;min-height:400px}
   .gallery .swiper{height:300px}
   .mimg{max-height:380px}
@@ -693,7 +708,10 @@ const ICONS={
   rotate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8M3 3v5h5"/></svg>',
   drag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>',
   upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
-  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>'
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></svg>',
+  chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>',
+  chevR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>'
 };
 
 let PRODUCTS=[], activeGroup='all', searchTerm='', _currentRow=null;
@@ -1035,64 +1053,115 @@ function mediaItemHTML(label,url,hint){
    Mạch: Đây là gì → Câu chuyện/lý do → Công nghệ → Lợi ích → Ứng dụng → Vì sao chọn */
 function storyHTML(p){
   const feats=p.features||[], apps=p.applications||[], fab=p.fab||[];
-  let h='<div class="story">';
+  const chapters=[];
 
-  // 1. MỞ ĐẦU — đây là gì (type) + tagline lớn, dẫn dắt
-  h+=`<div class="story-hero">
-        <div class="sh-kick">${esc(p.group)}</div>
-        ${p.tagline?`<div class="sh-tagline">${esc(p.tagline)}</div>`:''}
-        ${p.type?`<p class="sh-type">${esc(p.type)}</p>`:''}
-      </div>`;
-
-  // 2. CÂU CHUYỆN — concept dài kể như narrative (nếu có)
-  if(p.conceptLong){
-    h+=`<div class="story-narrative">
-          <div class="sn-mark">${ICONS.concept}</div>
-          <p>${esc(p.conceptLong)}</p>
-        </div>`;
-  }
-
-  // 3. LỢI ÍCH (FAB) — phần "vì sao nó tốt", đặt nổi bật sớm vì đây là điều người đọc quan tâm
+  // CHAPTER 1: Tổng quan
+  chapters.push({
+    kick:'Tổng quan', title: p.tagline||p.name, icon:ICONS.concept, accent:'navy',
+    body:`${p.type?`<p class="ch-lead">${esc(p.type)}</p>`:''}
+          ${p.conceptLong?`<div class="ch-narrative">${ICONS.concept}<p>${esc(p.conceptLong)}</p></div>`:''}`
+  });
+  // CHAPTER 2: Vì sao chọn (FAB)
   if(fab.length){
-    h+=`<div class="story-sec">
-          <div class="ss-head"><span class="ss-step">01</span><div><b>Vì sao chọn sản phẩm này</b><small>Đặc tính chuyển thành lợi ích thực tế</small></div></div>
-          <div class="benefit-grid">${fab.map(x=>{
-            // tách "TIÊU ĐỀ → diễn giải" nếu có dấu →
-            const parts=x.split(/→(.+)/);
-            if(parts.length>=2){
-              return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><b>${esc(parts[0].trim())}</b><span>${esc(parts[1].trim())}</span></div></div>`;
-            }
-            return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><span>${esc(x)}</span></div></div>`;
-          }).join('')}</div>
-        </div>`;
+    chapters.push({
+      kick:'Lợi ích', title:'Vì sao chọn sản phẩm này', icon:ICONS.fab, accent:'green',
+      body:`<div class="benefit-grid">${fab.map(x=>{
+        const parts=x.split(/→(.+)/);
+        if(parts.length>=2) return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><b>${esc(parts[0].trim())}</b><span>${esc(parts[1].trim())}</span></div></div>`;
+        return `<div class="benefit"><div class="bf-ic">${ICONS.check}</div><div><span>${esc(x)}</span></div></div>`;
+      }).join('')}</div>`
+    });
   }
-
-  // 4. CÔNG NGHỆ CỐT LÕI (features)
+  // CHAPTER 3: Công nghệ
   if(feats.length){
-    h+=`<div class="story-sec">
-          <div class="ss-head"><span class="ss-step">02</span><div><b>Công nghệ & đặc tính cốt lõi</b><small>Những gì làm nên sản phẩm</small></div></div>
-          <div class="tech-list">${feats.map((x,i)=>`<div class="tech"><span class="tech-n">${i+1}</span><p>${esc(x)}</p></div>`).join('')}</div>
-        </div>`;
+    chapters.push({
+      kick:'Công nghệ', title:'Đặc tính & công nghệ cốt lõi', icon:ICONS.feat, accent:'blue',
+      body:`<div class="tech-list">${feats.map((x,i)=>`<div class="tech"><span class="tech-n">${i+1}</span><p>${esc(x)}</p></div>`).join('')}</div>`
+    });
   }
-
-  // 5. ỨNG DỤNG (chips)
+  // CHAPTER 4: Ứng dụng
   if(apps.length){
-    h+=`<div class="story-sec">
-          <div class="ss-head"><span class="ss-step">03</span><div><b>Chỉ định & ứng dụng lâm sàng</b><small>Dùng trong những trường hợp nào</small></div></div>
-          <div class="app-chips">${apps.map(x=>`<div class="app-chip">${ICONS.app}<span>${esc(x)}</span></div>`).join('')}</div>
-        </div>`;
+    chapters.push({
+      kick:'Ứng dụng', title:'Chỉ định & ứng dụng lâm sàng', icon:ICONS.app, accent:'blue',
+      body:`<div class="app-chips">${apps.map(x=>`<div class="app-chip">${ICONS.app}<span>${esc(x)}</span></div>`).join('')}</div>`
+    });
   }
-
-  // 6. KẾT — USP (điểm chốt, vì sao vượt trội)
+  // CHAPTER 5: Điểm khác biệt (USP)
   if(p.usp){
-    h+=`<div class="story-usp">
-          <span class="su-label">${ICONS.usp} Điểm khác biệt</span>
-          <p>${esc(p.usp)}</p>
-        </div>`;
+    chapters.push({
+      kick:'Điểm khác biệt', title:'Điều làm nên sự khác biệt', icon:ICONS.usp, accent:'gold',
+      body:`<div class="ch-usp">${esc(p.usp)}</div>`
+    });
   }
 
-  h+='</div>';
-  return h;
+  const n=chapters.length;
+  const slides=chapters.map((c,i)=>`
+    <div class="story-slide${i===0?' active':''}" data-si="${i}">
+      <div class="slide-card accent-${c.accent}">
+        <div class="sc-head">
+          <div class="sc-ic">${c.icon}</div>
+          <div class="sc-ti"><div class="sc-kick">${esc(c.kick)}</div><h3>${esc(c.title)}</h3></div>
+          <div class="sc-count">${i+1}<span>/${n}</span></div>
+        </div>
+        <div class="sc-body">${c.body}</div>
+      </div>
+    </div>`).join('');
+  const dots=chapters.map((c,i)=>`<button class="story-dot${i===0?' active':''}" data-go="${i}" title="${esc(c.kick)}"><span>${esc(c.kick)}</span></button>`).join('');
+
+  return `<div class="story-carousel" data-total="${n}">
+    <div class="story-track">${slides}</div>
+    <div class="story-progress"><div class="sp-fill"></div></div>
+    <div class="story-nav">
+      <button class="sn-arrow" data-dir="-1" aria-label="Trước">${ICONS.chevL}</button>
+      <div class="story-dots">${dots}</div>
+      <button class="sn-play" title="Tạm dừng / tự chạy">${ICONS.pause}</button>
+      <button class="sn-arrow" data-dir="1" aria-label="Sau">${ICONS.chevR}</button>
+    </div>
+  </div>`;
+}
+
+/* Carousel Thông tin: tự chạy 5s, lật manual, pause/play, vuốt mobile */
+let _storyCtl=null;
+function initStoryCarousel(){
+  if(_storyCtl){_storyCtl.stop();_storyCtl=null}
+  const car=document.querySelector('.story-carousel');if(!car)return;
+  const total=+car.getAttribute('data-total');
+  const track=car.querySelector('.story-track');
+  const slides=[...car.querySelectorAll('.story-slide')];
+  const dots=[...car.querySelectorAll('.story-dot')];
+  const fill=car.querySelector('.sp-fill');
+  const playBtn=car.querySelector('.sn-play');
+  let cur=0, playing=true, AUTO=5000, t0=0, raf=null;
+
+  function render(){
+    slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+    dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
+    const ah=slides[cur].firstElementChild.offsetHeight;
+    track.style.height=ah+'px';
+  }
+  function go(i,manual){cur=(i%total+total)%total;render();if(manual){restart()}}
+  function next(){go(cur+1)}
+  function loop(){
+    if(!playing)return;
+    const el=Math.min(1,(Date.now()-t0)/AUTO);
+    if(fill)fill.style.width=(el*100)+'%';
+    if(el>=1){next();t0=Date.now()}
+    raf=requestAnimationFrame(loop);
+  }
+  function restart(){t0=Date.now();if(fill)fill.style.width='0%'}
+  function play(){playing=true;playBtn.innerHTML=ICONS.pause;restart();cancelAnimationFrame(raf);loop()}
+  function pause(){playing=false;playBtn.innerHTML=ICONS.play;cancelAnimationFrame(raf)}
+
+  car.querySelectorAll('.sn-arrow').forEach(b=>b.onclick=()=>go(cur+(+b.getAttribute('data-dir')),true));
+  dots.forEach(d=>d.onclick=()=>go(+d.getAttribute('data-go'),true));
+  playBtn.onclick=()=>{playing?pause():play()};
+  let sx=0,sw=false;
+  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sw=true},{passive:true});
+  track.addEventListener('touchend',e=>{if(!sw)return;sw=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(cur+(dx<0?1:-1),true)});
+
+  render();setTimeout(render,80);play();
+  _storyCtl={pause,play,stop:()=>{playing=false;cancelAnimationFrame(raf)},render};
+  window.addEventListener('resize',render);
 }
 
 function openDetail(row){
@@ -1158,6 +1227,7 @@ function openDetail(row){
   else if(imgs.length===1){ initSpin(); }
   if(multi){ setTimeout(()=>initGallery(),120); }
   initDropzone();
+  initStoryCarousel();
 }
 
 /* ---------- 360° IMAGE-SEQUENCE (Sketchfab-style) ---------- */
@@ -1389,6 +1459,19 @@ function switchTab(el,id){
   });
   // Auto-play khi mở tab Video
   if(id==='video'){ setupVideoSequence(pane); }
+  // Kích hoạt tự chạy slide: reload iframe với start=true để Google bắt đầu auto-advance
+  if(id==='ppt'){ activateSlides(pane); }
+  if(_storyCtl){ if(id==='info'){_storyCtl.play();_storyCtl.render&&_storyCtl.render()} else {_storyCtl.pause()} }
+}
+
+/* Reload iframe slide để Google Slides bắt đầu tự chạy (autoplay chỉ chạy khi iframe (re)load lúc tab hiển thị) */
+function activateSlides(pane){
+  pane.querySelectorAll('iframe[data-slide]').forEach(f=>{
+    if(f._activated)return;f._activated=true;
+    // ép reload để autoplay khởi động đúng lúc tab đang mở
+    const src=f.getAttribute('src');
+    f.setAttribute('src',src);
+  });
 }
 
 /* Phát video tuần tự: video đầu tự play, xong tự chuyển video kế */
@@ -1406,7 +1489,7 @@ function setupVideoSequence(pane){
     setTimeout(()=>{try{first.muted=false}catch(e){}},300);
   }).catch(()=>{ /* nếu bị chặn, người dùng bấm play thủ công */ });
 }
-function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_seqCleanup){_seqCleanup();_seqCleanup=null}if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';_currentRow=null;if(_storyCtl){_storyCtl.stop();_storyCtl=null}if(_seqCleanup){_seqCleanup();_seqCleanup=null}if(_gallerySwiper){try{_gallerySwiper.destroy(true,true)}catch(e){}_gallerySwiper=null}}
 function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')}
 
 /* ---------- EDIT ---------- */
