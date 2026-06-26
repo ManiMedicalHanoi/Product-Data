@@ -224,13 +224,14 @@ img{max-width:100%;display:block}
 @media(max-width:780px){.modal-top{grid-template-columns:1fr}}
 .modal-viewer{
   position:relative;background:
-    radial-gradient(130% 90% at 50% 8%,#fff,transparent 65%),
-    linear-gradient(155deg,var(--lb),#d6e6f6 55%,#c6d9ee);
-  display:grid;place-items:center;padding:36px;perspective:1300px;overflow:hidden;min-height:340px;
+    radial-gradient(120% 80% at 50% 0%,#ffffff,#fbfdff 45%,#f3f7fc);
+  display:grid;place-items:center;padding:36px 36px 52px;perspective:1300px;overflow:hidden;min-height:340px;
 }
-.modal-viewer .spinwrap{width:100%;height:100%;display:grid;place-items:center;transform-style:preserve-3d;transition:transform .1s linear;cursor:grab}
+/* bóng đổ elip dưới chân sản phẩm */
+.modal-viewer::after{content:'';position:absolute;bottom:34px;left:50%;transform:translateX(-50%);width:42%;max-width:240px;height:26px;background:radial-gradient(ellipse at center,rgba(0,40,70,.22),rgba(0,40,70,.08) 45%,transparent 72%);border-radius:50%;pointer-events:none;z-index:0;filter:blur(2px)}
+.modal-viewer .spinwrap{width:100%;height:100%;display:grid;place-items:center;transition:transform .12s ease-out;cursor:grab;position:relative;z-index:1}
 .modal-viewer .spinwrap.dragging{cursor:grabbing;transition:none}
-.modal-viewer .spinwrap img{max-width:100%;max-height:300px;object-fit:contain;filter:drop-shadow(0 24px 40px rgba(0,48,71,.3));pointer-events:none;user-select:none}
+.modal-viewer .spinwrap img{max-width:92%;max-height:320px;object-fit:contain;filter:drop-shadow(0 18px 26px rgba(0,40,70,.22));pointer-events:none;user-select:none;image-rendering:auto}
 .modal-viewer .heroph{color:rgba(58,92,170,.4);display:grid;place-items:center;text-align:center}
 .modal-viewer .heroph svg{width:72px;height:72px;margin-bottom:10px}
 .modal-viewer .heroph span{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
@@ -243,7 +244,7 @@ img{max-width:100%;display:block}
 .modal-viewer .drag-cue svg{width:14px;height:14px}
 .modal-viewer .spin360-badge{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:7px;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;padding:6px 13px;border-radius:30px;pointer-events:none}
 .modal-viewer .spin360-badge svg{width:13px;height:13px;color:var(--yellow)}
-.modal-viewer .seq-img{position:absolute;max-width:100%;max-height:300px;object-fit:contain;filter:drop-shadow(0 24px 40px rgba(0,48,71,.3));opacity:0;transition:opacity .05s;pointer-events:none;user-select:none}
+.modal-viewer .seq-img{position:absolute;max-width:92%;max-height:320px;object-fit:contain;filter:drop-shadow(0 18px 26px rgba(0,40,70,.22));opacity:0;transition:opacity .05s;pointer-events:none;user-select:none}
 .modal-viewer .seq-img.show{opacity:1}
 .modal-viewer .seqbar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:60%;max-width:240px;height:4px;background:rgba(0,48,71,.15);border-radius:4px;overflow:hidden;pointer-events:none}
 .modal-viewer .seqbar .fill{height:100%;background:var(--blue);border-radius:4px;width:0;transition:width .05s}
@@ -371,6 +372,17 @@ img{max-width:100%;display:block}
 .vid-note svg{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:1px}
 .media-stack{display:flex;flex-direction:column;gap:20px}
 .media-stack .mcard{margin:0}
+/* bộ chọn nhiều tài liệu */
+.media-switcher{display:flex;flex-direction:column;gap:14px}
+.msw-bar{display:flex;flex-wrap:wrap;gap:8px;padding:4px;background:var(--pale);border:1px solid var(--line);border-radius:14px}
+.msw-chip{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;border:none;background:transparent;color:#5a708a;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s var(--ease)}
+.msw-chip svg{width:15px;height:15px}
+.msw-chip:hover{background:#e6eef9;color:var(--navy)}
+.msw-chip.active{background:#fff;color:var(--navy);box-shadow:var(--shadow-sm)}
+.msw-chip.active svg{color:var(--blue)}
+.msw-pane{display:none}
+.msw-pane.active{display:block;animation:fadeMedia .35s var(--ease)}
+@keyframes fadeMedia{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .mimg{width:100%;max-height:560px;object-fit:contain;background:#0c1a2c;display:block;cursor:zoom-in}
 .nomedia{text-align:center;padding:60px 24px;color:var(--muted)}
 .nomedia svg{width:52px;height:52px;opacity:.3;margin-bottom:14px}
@@ -951,15 +963,35 @@ function blistHTML(arr,cls){
 /* Tách nhiều link (phẩy / xuống dòng / |) cho video, slide, pdf... */
 function splitLinks(raw){
   if(!raw) return [];
-  return String(raw).split(/[\n,|]+/).map(s=>s.trim()).filter(Boolean);
+  // tách các MỤC bằng xuống dòng hoặc phẩy (KHÔNG tách bằng |, vì | dùng cho "tên | link")
+  return String(raw).split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).map(s=>{
+    const i=s.indexOf('|');
+    return i>=0 ? s.slice(i+1).trim() : s; // chỉ lấy phần link
+  }).filter(Boolean);
+}
+// Trả [{name, url}] — name là phần trước dấu | nếu có
+function splitMedia(raw){
+  if(!raw) return [];
+  return String(raw).split(/[\n,]+/).map(s=>s.trim()).filter(Boolean).map(s=>{
+    const i=s.indexOf('|');
+    if(i>=0) return {name:s.slice(0,i).trim(), url:s.slice(i+1).trim()};
+    return {name:'', url:s};
+  }).filter(x=>x.url);
 }
 function isVimeo(url){return /vimeo\.com/.test(url||'')}
+// làm sạch tên file để hiển thị: bỏ đuôi, bỏ dấu |, rút gọn
+function cleanFileName(fn){
+  if(!fn) return '';
+  let n=String(fn).replace(/\.[a-z0-9]{2,5}$/i,'').replace(/\|/g,'-').trim();
+  if(n.length>32) n=n.slice(0,30).trim()+'…';
+  return n;
+}
 function vimeoEmbed(url){const m=url.match(/vimeo\.com\/(?:video\/)?(\d+)/);return m?`https://player.vimeo.com/video/${m[1]}`:url}
 
 /* ----- VIDEO: hỗ trợ YouTube, Vimeo, Drive (thử <video> trực tiếp, fallback iframe) ----- */
 function oneVideoHTML(url,idx,total){
   const id=driveId(url);
-  const label = total>1 ? `Video ${idx+1}/${total}` : 'Video sản phẩm';
+  const label = total>1 ? `Video ${idx+1}` : 'Video sản phẩm';
   let viewer;
   if(isYouTube(url)){
     const base=ytEmbed(url);
@@ -990,9 +1022,44 @@ function oneVideoHTML(url,idx,total){
       </div>
     </div>${viewer}</div>`;
 }
+/* ===== Bộ chọn nhiều tài liệu: thanh chip ở trên, hiện 1 item, mặc định item đầu ===== */
+function mediaSwitcher(items, kind){
+  if(!items.length) return '';
+  if(items.length===1) return `<div class="media-stack">${items[0].html}</div>`;
+  const chips=items.map((it,i)=>`<button class="msw-chip${i===0?' active':''}" data-mi="${i}">${kindIcon(kind)}<span>${esc(it.label)}</span></button>`).join('');
+  const panes=items.map((it,i)=>`<div class="msw-pane${i===0?' active':''}" data-mi="${i}">${it.html}</div>`).join('');
+  return `<div class="media-switcher" data-kind="${kind}">
+    <div class="msw-bar">${chips}</div>
+    <div class="msw-body">${panes}</div>
+  </div>`;
+}
+function kindIcon(kind){
+  if(kind==='video') return ICONS.vid;
+  if(kind==='presentation') return ICONS.ppt;
+  return ICONS.pdf;
+}
+function initMediaSwitchers(root){
+  (root||document).querySelectorAll('.media-switcher').forEach(sw=>{
+    if(sw._init)return;sw._init=true;
+    const chips=[...sw.querySelectorAll('.msw-chip')];
+    const panes=[...sw.querySelectorAll('.msw-pane')];
+    chips.forEach(c=>c.onclick=()=>{
+      const i=+c.getAttribute('data-mi');
+      chips.forEach(x=>x.classList.toggle('active',x===c));
+      panes.forEach(p=>p.classList.toggle('active',+p.getAttribute('data-mi')===i));
+      const pane=panes.find(p=>+p.getAttribute('data-mi')===i);
+      if(pane){
+        if(sw.getAttribute('data-kind')==='presentation') activateSlides(pane);
+        if(sw.getAttribute('data-kind')==='video') activateVideos(pane);
+      }
+    });
+  });
+}
+
 function videoHTML(raw){
-  const urls=splitLinks(raw);if(!urls.length)return '';
-  return `<div class="media-stack" data-autostack="video">${urls.map((u,i)=>oneVideoHTML(u,i,urls.length)).join('')}</div>`;
+  const items=splitMedia(raw);if(!items.length)return '';
+  const out=items.map((it,i)=>({label: it.name || (items.length>1?`Video ${i+1}`:'Video'), html: oneVideoHTML(it.url,i,items.length)}));
+  return mediaSwitcher(out,'video');
 }
 // Khi <video> Drive lỗi → thay bằng iframe preview
 function videoFallback(v){
@@ -1007,7 +1074,7 @@ function oneSlideHTML(url,idx,total){
   const id=driveId(url);
   const isGS=/\/presentation\/d\//.test(url);
   const isPPT=/rtpof=true/.test(url) || /\.pptx?(\?|$)/i.test(url); // file PowerPoint upload lên Drive
-  const label= total>1 ? `Slide ${idx+1}/${total}` : 'Slide trình bày';
+  const label= total>1 ? `Slide ${idx+1}` : 'Slide trình bày';
   if(isGS&&id){
     // /embed autoplay CHỈ hoạt động với Google Slides GỐC.
     // File .pptx upload (rtpof=true) sẽ ra Drive PDF-viewer (Trang x/y) — không autoplay được.
@@ -1032,14 +1099,17 @@ function oneSlideHTML(url,idx,total){
   return mediaItemHTML(label,url,'presentation');
 }
 function presentationHTML(raw){
-  const urls=splitLinks(raw);if(!urls.length)return '';
-  return `<div class="media-stack">${urls.map((u,i)=>oneSlideHTML(u,i,urls.length)).join('')}</div>`;
+  const items=splitMedia(raw);if(!items.length)return '';
+  const out=items.map((it,i)=>({label: it.name || (items.length>1?`Slide ${i+1}`:'Slide'), html: oneSlideHTML(it.url,i,items.length)}));
+  return mediaSwitcher(out,'presentation');
 }
 
 /* ----- PDF/Tài liệu nhiều bản ----- */
 function docsHTML(raw,label,hint){
-  const urls=splitLinks(raw);if(!urls.length)return '';
-  return `<div class="media-stack">${urls.map((u,i)=>mediaItemHTML(urls.length>1?`${label} ${i+1}`:label,u,hint)).join('')}</div>`;
+  const items=splitMedia(raw);if(!items.length)return '';
+  const short=label.split('—')[0].trim();
+  const out=items.map((it,i)=>({label: it.name || (items.length>1?`${short} ${i+1}`:short), html: mediaItemHTML(it.name || (items.length>1?`${label} ${i+1}`:label),it.url,hint)}));
+  return mediaSwitcher(out, hint==='presentation'?'presentation':'pdf');
 }
 
 function mediaItemHTML(label,url,hint){
@@ -1198,7 +1268,7 @@ function openDetail(row){
       <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else if(imgs.length===1){
     viewer=`<div class="spinwrap" id="spinwrap" data-mode="tilt"><img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" onerror="seqImgRetry(this)"></div>
-      <div class="reflect"></div><div class="drag-cue">${ICONS.drag} Tự xoay · kéo để điều khiển</div>
+      <div class="drag-cue">${ICONS.drag} Kéo để di chuyển ảnh</div>
       <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else{
     viewer=`<div class="dropzone" onclick="pickFiles(event)">
@@ -1248,6 +1318,7 @@ function openDetail(row){
   if(multi){ setTimeout(()=>initGallery(),120); }
   initDropzone();
   initStoryCarousel();
+  initMediaSwitchers();
 }
 
 /* ---------- 360° IMAGE-SEQUENCE (Sketchfab-style) ---------- */
@@ -1371,7 +1442,10 @@ async function handleFiles(files){
       done++;
       showUploading(`Đang tải lên ${done}/${plan.length}…`,item.file.name);
       const r=await uploadOne(item.file,p.name);
-      (updates[item.col]=updates[item.col]||[]).push(r.url);
+      // tên hiển thị = tên file gốc (bỏ đuôi), lưu dạng "Tên | link" để hiện đúng tên trong bộ chọn
+      const nm=cleanFileName(item.file.name);
+      const entry = nm ? (nm+' | '+r.url) : r.url;
+      (updates[item.col]=updates[item.col]||[]).push(entry);
     }
     showUploading('Đang lưu vào Sheet…','');
     const data={...p};delete data._row;
@@ -1444,21 +1518,25 @@ async function uploadOne(file,productName){
 /* ---------- DRAG-TO-ROTATE 3D in modal viewer ---------- */
 function initSpin(){
   const w=document.getElementById('spinwrap');if(!w)return;
-  let rx=-4, ry=0, dragging=false, lx=0, ly=0, raf, paused=false, hMove=false;
-  function apply(){w.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`}
+  const img=w.querySelector('img');
+  let t=0, dragging=false, lx=0, ly=0, dx=0, dy=0, raf, hMove=false;
+  // hiệu ứng "trôi" nhẹ: nhấp nhô + nghiêng cực nhẹ (không méo phối cảnh mạnh)
+  function apply(){
+    const floatY=Math.sin(t)*6;            // nhấp nhô ±6px
+    const tilt=Math.sin(t*0.7)*1.5;        // nghiêng ±1.5deg (rất nhẹ, không méo)
+    w.style.transform=`translate(${dx}px,${dy+floatY}px) rotate(${tilt}deg)`;
+  }
   function loop(){
     cancelAnimationFrame(raf);
-    (function tick(){
-      if(!dragging && !paused){ ry+=0.35; rx+=(-4-rx)*0.05; apply(); } // tự xoay liên tục, chậm
-      raf=requestAnimationFrame(tick);
-    })();
+    (function tick(){ if(!dragging){ t+=0.018; dx*=0.9; dy*=0.9; apply(); } raf=requestAnimationFrame(tick); })();
   }
   apply();loop();
   function down(e){dragging=true;w.classList.add('dragging');const pt=e.touches?e.touches[0]:e;lx=pt.clientX;ly=pt.clientY;hMove=false}
-  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const dx=pt.clientX-lx,dy=pt.clientY-ly;
-    if(!hMove && e.touches && Math.abs(dy)>Math.abs(dx)){dragging=false;return} // vuốt dọc → cho trang cuộn
+  function move(e){if(!dragging)return;const pt=e.touches?e.touches[0]:e;const mx=pt.clientX-lx,my=pt.clientY-ly;
+    if(!hMove && e.touches && Math.abs(my)>Math.abs(mx)){dragging=false;return} // vuốt dọc → cho cuộn
     if(e.touches){hMove=true;if(e.cancelable)e.preventDefault()}
-    ry+=dx*0.6;rx-=dy*0.4;rx=Math.max(-50,Math.min(50,rx));lx=pt.clientX;ly=pt.clientY;apply()}
+    dx+=mx*0.5;dy+=my*0.5;dx=Math.max(-60,Math.min(60,dx));dy=Math.max(-40,Math.min(40,dy));
+    lx=pt.clientX;ly=pt.clientY;apply()}
   function up(){if(!dragging)return;dragging=false;w.classList.remove('dragging')}
   w.addEventListener('mousedown',down);window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   w.addEventListener('touchstart',down,{passive:true});w.addEventListener('touchmove',move,{passive:false});w.addEventListener('touchend',up);
@@ -1558,10 +1636,10 @@ function openEdit(row){
       <div class="field"><label>Câu chuyện sản phẩm</label><textarea id="f_concept" rows="3">${esc(p.conceptLong)}</textarea></div>
       <div class="fgl">Media & Tài liệu (dán link Google Drive)</div>
       <div class="field"><label>Ảnh <span class="opt">— dán 1 link, hoặc nhiều link (cách nhau bằng dấu phẩy / xuống dòng) để bật xoay 360°</span></label><textarea id="f_image" rows="2" placeholder="https://drive.google.com/file/d/.../view&#10;https://drive.google.com/file/d/.../view  ← thêm để xoay 360°">${esc(p.image)}</textarea></div>
-      <div class="field"><label>Video <span class="opt">— 1 hoặc nhiều link (mỗi dòng 1 link). YouTube / Vimeo / Drive</span></label><textarea id="f_video" rows="2" placeholder="https://youtu.be/...&#10;https://drive.google.com/file/d/.../view">${esc(p.video)}</textarea></div>
-      <div class="field"><label>Slide trình bày <span class="opt">— link Google Slides để TỰ CHẠY (File ▸ Lưu dưới dạng Google Trang trình bày nếu đang là PPT). Nhiều link: mỗi dòng 1</span></label><textarea id="f_presentation" rows="2" placeholder="https://docs.google.com/presentation/d/.../edit">${esc(p.presentation)}</textarea></div>
-      <div class="field"><label>IFU <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_ifu" rows="2">${esc(p.ifu)}</textarea></div>
-      <div class="field"><label>Brochure <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_brochure" rows="2">${esc(p.brochure)}</textarea></div>
+      <div class="field"><label>Video <span class="opt">— mỗi dòng 1 link (YouTube/Vimeo/Drive). Đặt tên: "Tên hiển thị | link"</span></label><textarea id="f_video" rows="2" placeholder="Video giới thiệu | https://youtu.be/...&#10;Hướng dẫn dùng | https://drive.google.com/file/d/.../view">${esc(p.video)}</textarea></div>
+      <div class="field"><label>Slide trình bày <span class="opt">— link Google Slides để TỰ CHẠY. Mỗi dòng 1. Đặt tên: "Tên | link"</span></label><textarea id="f_presentation" rows="2" placeholder="Bài giới thiệu | https://docs.google.com/presentation/d/.../edit">${esc(p.presentation)}</textarea></div>
+      <div class="field"><label>IFU <span class="opt">— mỗi dòng 1 link. Đặt tên: "Tên | link"</span></label><textarea id="f_ifu" rows="2">${esc(p.ifu)}</textarea></div>
+      <div class="field"><label>Brochure <span class="opt">— mỗi dòng 1 link. Đặt tên: "Tên | link"</span></label><textarea id="f_brochure" rows="2">${esc(p.brochure)}</textarea></div>
     </div>
     <div class="mfoot">
       <button class="btn ghost" onclick="closeEdit()">Huỷ</button>
