@@ -184,10 +184,10 @@ img{max-width:100%;display:block}
 .pcard .gtag{position:absolute;top:14px;left:14px;z-index:3;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:5px 12px;border-radius:30px}
 .pcard .card360{position:absolute;bottom:14px;left:14px;z-index:3;display:flex;align-items:center;gap:5px;background:rgba(255,225,0,.95);color:var(--navy);font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:5px 11px;border-radius:30px;box-shadow:0 3px 10px rgba(0,48,71,.2)}
 .pcard .card360 svg{width:12px;height:12px}
-/* ảnh card lỗi → ẩn hẳn, hiện placeholder sạch (không text thừa chồng lên) */
-.pcard .obj:has(img.imgerr) img{display:none}
-.pcard .obj:has(img.imgerr) .card360{display:none}
-.pcard .obj:has(img.imgerr)::after{content:'';position:absolute;inset:0;background:var(--lb) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" stroke="%23a9bdd6" stroke-width="1.5"><rect x="6" y="9" width="32" height="26" rx="3"/><circle cx="16" cy="18" r="3"/><path d="M6 30l9-8 7 6 6-5 8 7"/></svg>') center/44px no-repeat;opacity:.7}
+/* ảnh card chỉ ẩn khi đã thử hết (allerr) → hiện placeholder sạch */
+.pcard .obj:has(img.allerr) img{display:none}
+.pcard .obj:has(img.allerr) .card360{display:none}
+.pcard .obj:has(img.allerr)::after{content:'';position:absolute;inset:0;background:#eef3fa url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" stroke="%23a9bdd6" stroke-width="1.5"><rect x="6" y="9" width="32" height="26" rx="3"/><circle cx="16" cy="18" r="3"/><path d="M6 30l9-8 7 6 6-5 8 7"/></svg>') center/44px no-repeat;opacity:.7}
 .pcard .chips-media{position:absolute;top:13px;right:13px;z-index:3;display:flex;gap:6px}
 .pcard .mchip{width:27px;height:27px;border-radius:9px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.14)}
 .pcard .mchip svg{width:14px;height:14px}
@@ -234,17 +234,17 @@ img{max-width:100%;display:block}
 .modal-viewer .heroph span{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .modal-viewer .drag-cue{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(0,48,71,.78);backdrop-filter:blur(6px);color:#fff;font-size:11.5px;font-weight:600;padding:7px 15px;border-radius:30px;pointer-events:none;opacity:.92}
 .modal-viewer .drag-cue svg{width:14px!important;height:14px!important;flex-shrink:0}
-.modal-viewer img.imgerr{opacity:0}
-.modal-viewer .spinwrap:has(img.imgerr)::after,.modal-viewer .spinwrap.allerr::after{content:'Ảnh chưa hiển thị được — kiểm tra quyền chia sẻ Drive (Bất kỳ ai có link)';position:absolute;inset:0;display:grid;place-items:center;color:#8aa0bd;font-size:12.5px;font-weight:600;text-align:center;padding:40px;line-height:1.5;z-index:2}
+.modal-viewer img.allerr{opacity:0}
+.modal-viewer .spinwrap:has(img.allerr)::after,.modal-viewer .spinwrap.allerr::after{content:'Ảnh chưa hiển thị được — kiểm tra quyền chia sẻ Drive (Bất kỳ ai có link)';position:absolute;inset:0;display:grid;place-items:center;color:#8aa0bd;font-size:12.5px;font-weight:600;text-align:center;padding:40px;line-height:1.5;z-index:2}
 .mimg.imgerr{min-height:200px;position:relative}
 .mcard:has(.mimg.imgerr) .mimg{background:#0c1a2c}
 .modal-viewer .drag-cue svg{width:14px;height:14px}
 .modal-viewer .spin360-badge{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:7px;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;padding:6px 13px;border-radius:30px;pointer-events:none}
 .modal-viewer .spin360-badge svg{width:13px;height:13px;color:var(--yellow)}
 /* khi viewer lỗi ảnh → ẩn mọi overlay thừa, chỉ còn 1 thông báo sạch */
-.modal-viewer:has(img.imgerr) .spin360-badge,
-.modal-viewer:has(img.imgerr) .drag-cue,
-.modal-viewer:has(img.imgerr) .seqbar,
+.modal-viewer:has(img.allerr) .spin360-badge,
+.modal-viewer:has(img.allerr) .drag-cue,
+.modal-viewer:has(img.allerr) .seqbar,
 .modal-viewer:has(.spinwrap.allerr) .spin360-badge,
 .modal-viewer:has(.spinwrap.allerr) .drag-cue,
 .modal-viewer:has(.spinwrap.allerr) .seqbar{display:none}
@@ -743,6 +743,7 @@ function driveId(url){
   if(!url) return null;
   let m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)||url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/)||
         url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/)||url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)||
+        url.match(/lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/)||
         url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
   return m?m[1]:null;
 }
@@ -769,11 +770,15 @@ function embedUrl(url,kind){
   if(id) return `https://drive.google.com/file/d/${id}/preview`;
   return url;
 }
-function imgUrl(url){const id=driveId(url);return id?`https://drive.google.com/thumbnail?id=${id}&sz=w1600`:url}
-// URL ảnh thay thế khi thumbnail lỗi (thử lần lượt)
+function imgUrl(url){const id=driveId(url);return id?`https://lh3.googleusercontent.com/d/${id}=w1600`:url}
+// URL ảnh thay thế khi URL chính lỗi (thử lần lượt) — dùng CHUNG cho cả card lẫn viewer
 function imgAltUrl(url,attempt){
   const id=driveId(url);if(!id)return url;
-  const alts=[`https://lh3.googleusercontent.com/d/${id}=w1600`,`https://drive.google.com/uc?export=view&id=${id}`,`https://drive.google.com/thumbnail?id=${id}&sz=w800`];
+  const alts=[
+    `https://drive.google.com/thumbnail?id=${id}&sz=w1600`,
+    `https://lh3.googleusercontent.com/d/${id}=w1000`,
+    `https://drive.google.com/thumbnail?id=${id}&sz=w800`
+  ];
   return alts[attempt]||url;
 }
 /* Tách nhiều link ảnh (cách nhau bằng dấu phẩy / xuống dòng / "|") → mảng URL hiển thị.
@@ -875,7 +880,7 @@ function renderGrid(){
     let obj;
     if(imgs.length>=1){
       // chỉ hiện ẢNH ĐẦU tĩnh (không tự xoay trên card → tránh nhấp nháy ở danh sách)
-      obj=`<img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)">${imgs.length>=2?`<div class="card360">${ICONS.rotate} ${imgs.length} góc</div>`:''}`;
+      obj=`<img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" onerror="seqImgRetry(this)">${imgs.length>=2?`<div class="card360">${ICONS.rotate} ${imgs.length} góc</div>`:''}`;
     }else{
       obj=`<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
     }
@@ -1314,13 +1319,13 @@ function preloadSeq(urls){urls.forEach(u=>{const i=new Image();i.src=u})}
 // Khi ảnh Drive lỗi (thumbnail bị chặn) → thử lần lượt các URL thay thế
 function seqImgRetry(img){
   const src=img.getAttribute('data-src'); let t=parseInt(img.getAttribute('data-try')||'0',10);
-  if(t>=3){img.classList.add('imgerr');return}
+  if(t>=3){ img.classList.add('allerr'); return }
   img.setAttribute('data-try',t+1);
   // preload URL thay thế ngầm; chỉ gán khi tải xong để KHÔNG gây nháy
   const next=imgAltUrl(src,t);
   const probe=new Image();
-  probe.onload=()=>{ img.src=next; img.classList.remove('imgerr'); };
-  probe.onerror=()=>{ seqImgRetry(img); }; // thử URL kế tiếp, vẫn ngầm
+  probe.onload=()=>{ img.src=next; img.classList.remove('allerr','imgerr'); };
+  probe.onerror=()=>{ seqImgRetry(img); };
   probe.src=next;
 }
 function initSeq360(n){
