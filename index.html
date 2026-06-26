@@ -355,13 +355,14 @@ img{max-width:100%;display:block}
 .mbtn:hover{border-color:var(--blue);color:var(--blue);background:var(--pale);transform:translateY(-1px)}
 .mbtn svg{width:16px;height:16px}
 .mframe{width:100%;background:var(--bg);border:0;display:block}
-.mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:75vh;min-height:560px}
+.mframe.pdf,.mframe.doc,.mframe.sheet{height:75vh;min-height:560px}
+.mframe.ppt{width:100%}
 .mframe.vid{aspect-ratio:16/9;height:auto}
 .mbtn-lg{display:flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:11px;background:var(--orange);color:#fff;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s var(--ease);white-space:nowrap}
 .mbtn-lg:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 6px 16px rgba(224,123,57,.4)}
 .mbtn-lg svg{width:14px;height:14px}
-.ppt-card .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c}
-.ppt-card .ppt-frame-wrap .mframe.ppt{position:absolute;inset:0;width:100%;height:100%;min-height:0}
+.ppt-card .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c;overflow:hidden}
+.ppt-card .ppt-frame-wrap .mframe.ppt{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-height:0!important}
 .mvideo{width:100%;max-height:72vh;background:#000;display:block;aspect-ratio:16/9}
 .vid-note{display:flex;align-items:flex-start;gap:8px;padding:11px 16px;font-size:12px;color:var(--muted);background:#fafcff;border-top:1px solid var(--line);line-height:1.45}
 .vid-note svg{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:1px}
@@ -557,7 +558,7 @@ img{max-width:100%;display:block}
   .ch-usp{font-size:15.5px}
   .story-dot.active{width:24px}
   .story-dot span{display:none}
-  .mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:64vh;min-height:400px}
+  .mframe.pdf,.mframe.doc,.mframe.sheet{height:64vh;min-height:400px}
   .gallery .swiper{height:300px}
   .mimg{max-height:380px}
   .mcard .mch{flex-wrap:wrap;gap:10px}
@@ -958,14 +959,21 @@ function oneVideoHTML(url,idx,total){
   const label = total>1 ? `Video ${idx+1}/${total}` : 'Video sản phẩm';
   let viewer;
   if(isYouTube(url)){
-    viewer=`<iframe class="mframe vid" src="${esc(ytEmbed(url))}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+    const base=ytEmbed(url);
+    const sep=base.includes('?')?'&':'?';
+    // autoplay=1&mute=1 → tự chạy tắt tiếng (trình duyệt chỉ cho autoplay khi muted). playsinline cho mobile.
+    const auto=`${base}${sep}autoplay=1&mute=1&rel=0&playsinline=1`;
+    viewer=`<iframe class="mframe vid" data-ytauto src="${esc(base+sep+'rel=0&playsinline=1')}" data-embed="${esc(auto)}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>
+            <div class="vid-note">${ICONS.info} Video tự phát ở chế độ tắt tiếng. Bấm biểu tượng loa trên video để bật âm thanh.</div>`;
   }else if(isVimeo(url)){
-    viewer=`<iframe class="mframe vid" src="${esc(vimeoEmbed(url))}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+    const base=vimeoEmbed(url);const sep=base.includes('?')?'&':'?';
+    viewer=`<iframe class="mframe vid" data-ytauto src="${esc(base)}" data-embed="${esc(base+sep+'autoplay=1&muted=1')}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>
+            <div class="vid-note">${ICONS.info} Video tự phát ở chế độ tắt tiếng. Bật loa trên video để nghe.</div>`;
   }else if(id){
-    // Drive KHÔNG cho stream qua thẻ <video> (chặn hotlink). Cách ổn định nhất là iframe /preview.
+    // Drive KHÔNG cho stream qua thẻ <video> (chặn hotlink) và KHÔNG cho autoplay qua iframe /preview.
     const prev=`https://drive.google.com/file/d/${id}/preview`;
     viewer=`<iframe class="mframe vid" src="${esc(prev)}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>
-            <div class="vid-note">${ICONS.info} Video Drive mới tải lên cần vài phút để xử lý. Để phát mượt & nhanh hơn, nên dùng <b>YouTube</b> (chưa công khai cũng được — đặt "Không công khai/Unlisted") rồi dán link vào ô Video.</div>`;
+            <div class="vid-note">${ICONS.info} Video Drive <b>không thể tự phát</b> (giới hạn của Google Drive) — phải bấm nút play. Muốn video <b>tự chạy</b>, hãy dùng <b>YouTube</b> (đặt "Không công khai/Unlisted") rồi dán link vào ô Video.</div>`;
   }else{
     viewer=`<video class="mvideo" data-video controls playsinline preload="metadata"><source src="${esc(url)}"></video>`;
   }
@@ -997,19 +1005,20 @@ function oneSlideHTML(url,idx,total){
   const isGS=/\/presentation\/d\//.test(url);
   const label= total>1 ? `Slide ${idx+1}/${total}` : 'Slide trình bày';
   if(isGS&&id){
-    // delayms=5000 + loop → tự chuyển slide chậm (~5s/slide)
+    // embed CHUẨN của Google Slides: có sẵn thanh ◀ ▶ ở dưới + tự chạy 5s/slide.
+    // KHÔNG dùng rm=minimal (sẽ mất thanh điều khiển). start=true để tự chạy ngay.
     const embed=`https://docs.google.com/presentation/d/${id}/embed?start=true&loop=true&delayms=5000`;
     const present=`https://docs.google.com/presentation/d/${id}/present`;
     return `<div class="mcard ppt-card">
       <div class="mch">
         <div class="mci ppt">${ICONS.ppt}</div>
-        <div class="mct"><b>${esc(label)}</b><small>Tự chạy ~5s/slide · dùng ◀ ▶ để tự điều khiển</small></div>
+        <div class="mct"><b>${esc(label)}</b><small>Tự chạy 5s/slide · thanh ◀ ▶ ở mép dưới khung để tự lật</small></div>
         <div class="mca">
-          <a class="mbtn-lg" href="${present}" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play}<span>Trình chiếu</span></a>
+          <a class="mbtn-lg" href="${present}" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play}<span>Toàn màn hình</span></a>
           <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở Google Slides">${ICONS.ext}</a>
         </div>
       </div>
-      <div class="ppt-frame-wrap"><iframe class="mframe ppt" data-slide src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe></div>
+      <div class="ppt-frame-wrap"><iframe class="mframe ppt" data-slide data-embed="${esc(embed)}" src="${esc(embed)}" allow="autoplay" allowfullscreen loading="lazy" frameborder="0"></iframe></div>
     </div>`;
   }
   return mediaItemHTML(label,url,'presentation');
@@ -1462,7 +1471,7 @@ function switchTab(el,id){
   requestAnimationFrame(()=>{
     if(scroller.scrollHeight<=scroller.clientHeight+4) return;
     const tabsEl=modal.querySelector('.tabs');
-    const anchor = (id==='info') ? tabsEl : (pane.querySelector('.mcard, .gallery, .media-stack, .story-carousel') || tabsEl);
+    const anchor = (id==='tab-info') ? tabsEl : (pane.querySelector('.mcard, .gallery, .media-stack, .story-carousel') || tabsEl);
     if(anchor){
       const cur=scroller.scrollTop;
       const top=cur + anchor.getBoundingClientRect().top - (scroller===modal ? (tabsEl.offsetHeight+6) : (tabsEl.offsetHeight+70));
@@ -1470,20 +1479,28 @@ function switchTab(el,id){
     }
   });
   // Auto-play khi mở tab Video
-  if(id==='video'){ setupVideoSequence(pane); }
-  // Kích hoạt tự chạy slide: reload iframe với start=true để Google bắt đầu auto-advance
-  if(id==='ppt'){ activateSlides(pane); }
-  if(_storyCtl){ if(id==='info'){_storyCtl.play();_storyCtl.render&&_storyCtl.render()} else {_storyCtl.pause()} }
+  if(id==='tab-video'){ activateVideos(pane); setTimeout(()=>setupVideoSequence(pane),100); }
+  // Kích hoạt tự chạy slide
+  if(id==='tab-ppt'){ activateSlides(pane); }
+  if(_storyCtl){ if(id==='tab-info'){_storyCtl.play();_storyCtl.render&&_storyCtl.render()} else {_storyCtl.pause()} }
 }
 
 /* Reload iframe slide để Google Slides bắt đầu tự chạy (autoplay chỉ chạy khi iframe (re)load lúc tab hiển thị) */
 function activateSlides(pane){
   pane.querySelectorAll('iframe[data-slide]').forEach(f=>{
-    if(f._activated)return;f._activated=true;
-    // ép reload để autoplay khởi động đúng lúc tab đang mở
-    const src=f.getAttribute('src');
-    f.setAttribute('src',src);
+    const embed=f.getAttribute('data-embed')||f.getAttribute('src');
+    // luôn reload (đặt blank rồi gán lại) để Google khởi động autoplay đúng lúc tab đang mở
+    f.src='about:blank';
+    setTimeout(()=>{ f.src=embed; }, 50);
   });
+}
+
+/* Kích hoạt autoplay (tắt tiếng) cho video iframe đầu tiên khi mở tab Video */
+function activateVideos(pane){
+  const f=pane.querySelector('iframe[data-ytauto]');
+  if(!f)return;
+  const e=f.getAttribute('data-embed');
+  if(e){ f.src=e; }  // đổi sang URL có autoplay=1&mute=1
 }
 
 /* Phát video tuần tự: video đầu tự play, xong tự chuyển video kế */
