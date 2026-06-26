@@ -2,7 +2,8 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<meta name="theme-color" content="#003047">
 <title>MANI Medical Hanoi — Dental Product Showcase</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.1.14/swiper-bundle.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -186,6 +187,10 @@ img{max-width:100%;display:block}
 .pcard .gtag{position:absolute;top:14px;left:14px;z-index:3;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:5px 12px;border-radius:30px}
 .pcard .card360{position:absolute;bottom:14px;left:14px;z-index:3;display:flex;align-items:center;gap:5px;background:rgba(255,225,0,.95);color:var(--navy);font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:5px 11px;border-radius:30px;box-shadow:0 3px 10px rgba(0,48,71,.2)}
 .pcard .card360 svg{width:12px;height:12px}
+.pcard .cardseq{position:relative;width:100%;height:100%}
+.pcard .cardseq .cseq{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease}
+.pcard .cardseq .cseq.show{opacity:1}
+.pcard .obj img.imgerr{opacity:.15}
 .pcard .chips-media{position:absolute;top:13px;right:13px;z-index:3;display:flex;gap:6px}
 .pcard .mchip{width:27px;height:27px;border-radius:9px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.14)}
 .pcard .mchip svg{width:14px;height:14px}
@@ -213,7 +218,7 @@ img{max-width:100%;display:block}
 .overlay{position:fixed;inset:0;z-index:200;display:none;background:rgba(6,20,40,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
 .overlay.open{display:flex;animation:ovfade .3s var(--ease)}
 @keyframes ovfade{from{opacity:0}to{opacity:1}}
-.modal{background:#fff;border-radius:28px;width:100%;max-width:1080px;box-shadow:var(--shadow-xl);overflow:hidden;margin:auto 0;animation:modalIn .5s var(--ease-spring)}
+.modal{background:#fff;border-radius:28px;width:100%;max-width:1200px;box-shadow:var(--shadow-xl);overflow:hidden;margin:auto 0;animation:modalIn .5s var(--ease-spring)}
 @keyframes modalIn{from{transform:translateY(40px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
 .modal-top{position:relative;display:grid;grid-template-columns:1.05fr 1fr;min-height:340px}
 @media(max-width:780px){.modal-top{grid-template-columns:1fr}}
@@ -252,7 +257,25 @@ img{max-width:100%;display:block}
 .gallery .swiper-pagination-bullet{background:#fff;opacity:.55}
 .gallery .swiper-pagination-bullet-active{background:var(--yellow);opacity:1}
 .modal-viewer .reflect{position:absolute;left:18%;right:18%;bottom:26px;height:34px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,48,71,.22),transparent 70%);filter:blur(8px)}
-/* ---- QUICK DROPZONE ---- */
+/* ---- DOCTYPE PICKER ---- */
+.doctype-overlay{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,20,40,.55);backdrop-filter:blur(8px);opacity:0;transition:.2s}
+.doctype-overlay.show{opacity:1}
+.doctype-box{background:#fff;border-radius:22px;width:100%;max-width:440px;padding:24px;box-shadow:var(--shadow-xl);transform:translateY(20px) scale(.96);transition:.28s var(--ease-spring)}
+.doctype-overlay.show .doctype-box{transform:translateY(0) scale(1)}
+.doctype-box .dt-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
+.doctype-box .dt-ic{width:44px;height:44px;border-radius:13px;background:#c0392b;display:grid;place-items:center;flex-shrink:0}
+.doctype-box .dt-ic svg{width:22px;height:22px;color:#fff}
+.doctype-box .dt-head b{font-size:16px;color:var(--navy);display:block}
+.doctype-box .dt-head small{font-size:12px;color:var(--muted);word-break:break-all;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.doctype-box .dt-q{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:14px}
+.doctype-box .dt-opts{display:grid;gap:10px;margin-bottom:14px}
+.doctype-box .dt-opt{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);background:#fbfcfe;cursor:pointer;font-family:inherit;text-align:left;transition:.2s var(--ease);width:100%}
+.doctype-box .dt-opt:hover{border-color:var(--blue);background:var(--pale);transform:translateX(3px)}
+.doctype-box .dt-opt svg{width:22px;height:22px;color:var(--blue);flex-shrink:0}
+.doctype-box .dt-opt span{font-size:14.5px;font-weight:700;color:var(--navy);line-height:1.3}
+.doctype-box .dt-opt span i{font-style:normal;font-weight:500;font-size:12px;color:var(--muted)}
+.doctype-box .dt-cancel{width:100%;padding:11px;border-radius:12px;border:none;background:var(--bg);color:var(--muted);font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.2s}
+.doctype-box .dt-cancel:hover{background:#e9eef6;color:var(--ink)}
 .dropzone{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;color:var(--blue);cursor:pointer;transition:.2s}
 .dropzone .dz-ic{width:54px;height:54px;border-radius:16px;background:rgba(255,255,255,.7);backdrop-filter:blur(6px);display:grid;place-items:center;box-shadow:var(--shadow-sm);transition:.25s var(--ease)}
 .dropzone .dz-ic svg{width:26px;height:26px;color:var(--blue)}
@@ -292,7 +315,7 @@ img{max-width:100%;display:block}
 .tab.active{color:var(--navy);border-bottom-color:var(--yellow)}
 .tab svg{width:16px;height:16px}
 .tab .badge{font-size:11px;background:var(--blue);color:#fff;border-radius:20px;padding:0 7px;min-width:18px;height:18px;display:grid;place-items:center;font-weight:700}
-.mbody{padding:30px 36px 36px;max-height:60vh;overflow-y:auto}
+.mbody{padding:24px 30px 30px;max-height:72vh;overflow-y:auto}
 .mbody::-webkit-scrollbar{width:8px}
 .mbody::-webkit-scrollbar-thumb{background:#d3deee;border-radius:6px}
 .pane{display:none}
@@ -332,8 +355,13 @@ img{max-width:100%;display:block}
 .mbtn:hover{border-color:var(--blue);color:var(--blue);background:var(--pale);transform:translateY(-1px)}
 .mbtn svg{width:16px;height:16px}
 .mframe{width:100%;background:var(--bg);border:0;display:block}
-.mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:520px}
+.mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:75vh;min-height:560px}
 .mframe.vid{aspect-ratio:16/9;height:auto}
+.mbtn-lg{display:flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:11px;background:var(--orange);color:#fff;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s var(--ease);white-space:nowrap}
+.mbtn-lg:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 6px 16px rgba(224,123,57,.4)}
+.mbtn-lg svg{width:14px;height:14px}
+.ppt-card .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c}
+.ppt-card .ppt-frame-wrap .mframe.ppt{position:absolute;inset:0;width:100%;height:100%;min-height:0}
 .mimg{width:100%;max-height:560px;object-fit:contain;background:#0c1a2c;display:block;cursor:zoom-in}
 .nomedia{text-align:center;padding:60px 24px;color:var(--muted)}
 .nomedia svg{width:52px;height:52px;opacity:.3;margin-bottom:14px}
@@ -378,15 +406,115 @@ img{max-width:100%;display:block}
 .foot .fmeta{font-size:12.5px;color:#8fb0cc;text-align:right;line-height:1.7}
 .foot .fmeta a{color:var(--yellow);font-weight:600}
 
+/* ===================== RESPONSIVE ===================== */
+/* Tablet */
+@media(max-width:900px){
+  .wrap{padding:0 18px}
+  .modal-top{grid-template-columns:1fr}
+  .modal-viewer{min-height:300px}
+  .modal-viewer .spinwrap img,.modal-viewer .seq-img{max-height:240px}
+  .modal-detail{padding:26px 26px 22px}
+  .section{padding:54px 0 24px}
+}
+/* Mobile */
 @media(max-width:680px){
-  .nav .search{min-width:0;width:42px;padding:0}.nav .search input{display:none}
-  .nav .search:focus-within{width:200px;min-width:0;padding:0 14px}.nav .search:focus-within input{display:block}
+  body{font-size:14.5px}
+  /* NAV gọn */
+  .nav{height:56px;padding:0 14px;gap:10px}
+  .nav .brand .mark{width:30px;height:30px;font-size:15px}
+  .nav .brand b{font-size:13.5px}
   .nav .brand span{display:none}
-  .hero .stat-strip{gap:24px}.hero .stat-strip .s b{font-size:26px}
-  .grid{grid-template-columns:1fr}
+  .nav .search{min-width:0;width:38px;height:36px;padding:0;justify-content:center}
+  .nav .search input{display:none}
+  .nav .search:focus-within{width:170px;min-width:0;padding:0 12px;justify-content:flex-start}
+  .nav .search:focus-within input{display:block}
+  .nav-btn{height:36px;font-size:12px;padding:0 12px}
+  .nav-btn.icon{width:36px}
+  .nav-btn.solid span{display:inline}
+
+  /* HERO */
+  .hero{min-height:auto;padding:96px 18px 56px}
+  .hero h1{letter-spacing:-1px}
+  .hero .eyebrow{font-size:11px;letter-spacing:1px;padding:7px 14px;margin-bottom:18px}
+  .hero p.lede{font-size:15px;margin-bottom:28px}
+  .hero .cta-row{flex-direction:column;width:100%;gap:10px}
+  .btn-cta{width:100%;justify-content:center;height:50px}
+  .hero .stat-strip{gap:20px;margin-top:44px}
+  .hero .stat-strip .s b{font-size:24px}
+  .hero .stat-strip .s span{font-size:11px}
+  .scroll-hint{display:none}
+
+  /* FILTER BAR sticky dưới nav */
+  .filterbar{top:56px;padding:10px 0}
+  .filterbar .wrap{flex-direction:column;align-items:stretch;gap:9px}
+  .chips{padding-bottom:2px}
+  .chip{padding:8px 14px;font-size:12.5px}
+  .conn{font-size:11px;justify-content:center;flex-wrap:wrap;text-align:center}
+
+  /* GRID 1 cột */
+  .section{padding:40px 0 20px}
+  .sec-head{margin-bottom:24px}
+  .grid{grid-template-columns:1fr;gap:18px}
+  .pcard .stage{height:210px}
+
+  /* MODAL full-screen feel */
+  .overlay{padding:0;align-items:stretch}
+  .modal{border-radius:20px 20px 0 0;max-width:100%;min-height:100vh;margin:0;align-self:flex-end}
+  @keyframes modalIn{from{transform:translateY(60px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .modal-viewer{min-height:260px;padding:26px}
+  .modal-viewer .spinwrap img,.modal-viewer .seq-img{max-height:200px}
+  .modal-viewer .dz-mini{bottom:12px;right:12px;font-size:11px;padding:6px 11px}
+  .modal-detail{padding:22px 20px 18px}
+  .modal-detail h2{font-size:21px}
+  .modal-detail .dtype{font-size:13px}
+  .modal-detail .dtag .v{font-size:16px}
+  .modal-close{top:12px;right:12px;width:36px;height:36px}
+  .modal-edit{top:12px;right:56px;height:36px;padding:0 12px;font-size:12px}
+
+  /* TABS scroll ngang */
+  .tabs{padding:4px 16px 0;gap:2px}
+  .tab{padding:13px 11px 12px;font-size:13px}
+  .tab .badge{min-width:16px;height:16px;font-size:10px}
+
+  /* BODY + media to hơn dễ đọc */
+  .mbody{padding:20px 16px 26px;max-height:none}
+  .block .bh{font-size:12px}
+  .blist li{font-size:13.5px;padding:11px 13px}
+  .usp{font-size:14.5px;padding:18px 18px}
+  .mframe.pdf,.mframe.ppt,.mframe.doc,.mframe.sheet{height:64vh;min-height:400px}
+  .gallery .swiper{height:300px}
+  .mimg{max-height:380px}
+  .mcard .mch{flex-wrap:wrap;gap:10px}
+  .mcard .mca{width:100%;justify-content:flex-end}
+  .mbtn-lg span{display:inline}
+
+  /* EDIT form full */
+  #editModal{max-width:100%}
   .frow{flex-direction:column;gap:0}
-  .mbody,.modal-detail{padding-left:22px;padding-right:22px}
-  .tabs{padding-left:22px;padding-right:22px}
+  .mfoot{padding:14px 18px;flex-direction:column-reverse}
+  .mfoot .btn{width:100%;justify-content:center}
+
+  /* DOCTYPE picker */
+  .doctype-box{max-width:100%;border-radius:18px;padding:20px}
+
+  /* FOOTER */
+  .foot .wrap{flex-direction:column;align-items:flex-start;gap:18px}
+  .foot .fmeta{text-align:left}
+
+  /* TOAST trên mobile rộng */
+  .toast{bottom:16px;left:16px;right:16px;transform:translateY(90px);max-width:none}
+  .toast.show{transform:translateY(0)}
+}
+/* Mobile nhỏ */
+@media(max-width:380px){
+  .hero h1{font-size:32px}
+  .modal-detail h2{font-size:19px}
+  .pcard .stage{height:185px}
+}
+/* Thiết bị cảm ứng: tắt tilt 3D gây giật, vẫn giữ auto-spin */
+@media(hover:none){
+  .pcard:hover{transform:none}
+  .pcard .obj{transform:none!important}
 }
 </style>
 </head>
@@ -645,9 +773,15 @@ function renderGrid(){
   if(!list.length){g.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><p>Không tìm thấy sản phẩm nào.</p></div>`;return}
   g.innerHTML=list.map(p=>{
     const imgs=splitImages(p.image);
-    const obj=imgs.length
-      ? `<img src="${esc(imgs[0])}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.ph').style.display='flex'"><div class="ph" style="display:none">${ICONS.photo}<span>Ảnh lỗi</span></div><div class="glare"></div>${imgs.length>=2?`<div class="card360">${ICONS.rotate} 360°</div>`:''}`
-      : `<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
+    let obj;
+    if(imgs.length>=2){
+      // nhiều ảnh → mini sequence tự chuyển ngay trên card
+      obj=`<div class="cardseq" data-frames="${imgs.length}">${imgs.map((u,i)=>`<img class="cseq${i===0?' show':''}" data-src="${esc(u)}" data-try="0" src="${esc(u)}" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)">`).join('')}</div><div class="glare"></div><div class="card360">${ICONS.rotate} 360°</div>`;
+    }else if(imgs.length===1){
+      obj=`<img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)"><div class="glare"></div>`;
+    }else{
+      obj=`<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
+    }
     return `<div class="pcard" onclick="openDetail(${p._row})">
       <div class="stage"><div class="obj" data-tilt>${obj}</div>
         <div class="gtag">${esc(p.group)}</div>${mediaChips(p)}</div>
@@ -660,7 +794,21 @@ function renderGrid(){
     </div>`;
   }).join('');
   attachTilts();
+  startCardSeq();
   revealCards();
+}
+// mini auto-rotate cho card có nhiều ảnh
+let _cardTimers=[];
+function startCardSeq(){
+  _cardTimers.forEach(t=>clearInterval(t));_cardTimers=[];
+  document.querySelectorAll('.cardseq').forEach(box=>{
+    const imgs=[...box.querySelectorAll('.cseq')];const n=imgs.length;if(n<2)return;
+    let f=0;
+    const t=setInterval(()=>{
+      f=(f+1)%n;imgs.forEach((im,i)=>im.classList.toggle('show',i===f));
+    },1100); // card xoay chậm hơn modal
+    _cardTimers.push(t);
+  });
 }
 function renderSkeleton(){
   document.getElementById('grid').innerHTML=Array(6).fill(0).map(()=>`<div class="skel"><div class="si"></div><div class="sb"><div class="sl" style="width:65%"></div><div class="sl" style="width:45%"></div><div class="sl" style="width:88%;height:34px;margin-top:6px"></div></div></div>`).join('');
@@ -722,21 +870,22 @@ function presentationHTML(url){
   const id=driveId(url);
   const isGSlides=/\/presentation\/d\//.test(url);
   if(isGSlides&&id){
-    // delayms lớn để không tự chạy; embed của Google có sẵn nút ◀ ▶ chuyển từng slide
-    const embed=`https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=60000&rm=minimal`;
-    return `<div class="mcard">
+    const embed=`https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false&delayms=60000`;
+    const presentUrl=`https://docs.google.com/presentation/d/${id}/present`;
+    return `<div class="mcard ppt-card">
       <div class="mch">
         <div class="mci ppt">${ICONS.ppt}</div>
-        <div class="mct"><b>Slide trình bày</b><small>Dùng nút ◀ ▶ ở khung dưới để xem từng slide</small></div>
+        <div class="mct"><b>Slide trình bày</b><small>Bấm "Trình chiếu" để xem từng slide như slideshow, hoặc dùng ◀ ▶ ngay trong khung</small></div>
         <div class="mca">
-          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/present" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play||ICONS.ext}</a>
+          <a class="mbtn-lg" href="${presentUrl}" target="_blank" title="Mở chế độ trình chiếu (slideshow)">${ICONS.play}<span>Trình chiếu</span></a>
           <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở trong Google Slides">${ICONS.ext}</a>
         </div>
       </div>
-      <iframe class="mframe ppt" src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe>
+      <div class="ppt-frame-wrap">
+        <iframe class="mframe ppt" src="${esc(embed)}" allowfullscreen loading="lazy" frameborder="0"></iframe>
+      </div>
     </div>`;
   }
-  // PPT file trên Drive (không phải Google Slides) → dùng preview của Drive
   return mediaItemHTML('Slide trình bày',url,'presentation');
 }
 
@@ -828,6 +977,7 @@ function openDetail(row){
     <div class="mbody">${panesHTML}</div>`;
   const m=document.getElementById('detailModal');m.scrollTop=0;
   document.getElementById('detailOverlay').classList.add('open');document.body.style.overflow='hidden';
+  const ov=document.getElementById('detailOverlay');ov.scrollTop=0;requestAnimationFrame(()=>{ov.scrollTop=0});
   if(multi){ initSeq360(imgs.length); preloadSeq(imgs); }
   else if(imgs.length===1){ initSpin(); }
   if(multi){ setTimeout(()=>initGallery(),120); }
@@ -848,7 +998,7 @@ function initSeq360(n){
   const imgs=[...w.querySelectorAll('.seq-img')];
   const fill=document.getElementById('seqfill');
   let frame=0, dragging=false, lx=0, timer=null;
-  const FRAME_MS=550; // tốc độ tự chuyển: ~0.55s mỗi ảnh (từ từ)
+  const FRAME_MS=900; // tốc độ tự chuyển: ~0.9s mỗi ảnh (chậm rãi, dễ nhìn)
   function show(f){
     f=((f%n)+n)%n; frame=f;
     imgs.forEach((im,i)=>im.classList.toggle('show',i===f));
@@ -929,17 +1079,29 @@ async function handleFiles(files){
   if(_currentRow==null){toast('Hãy mở một sản phẩm trước khi thêm media',true);return}
   if(!USE_LIVE){toast('Cần kết nối Google Sheet để upload (USE_LIVE=true)',true);return}
   const p=PRODUCTS.find(x=>x._row===_currentRow);if(!p)return;
-  const updates={}; // cột -> [links]
+
+  // Xác định cột đích cho từng file. PDF/doc → hỏi người dùng (IFU/Brochure)
+  const plan=[]; // {file, col}
+  for(const f of files){
+    const k=fileKind(f);
+    let col={image:'image',video:'video',presentation:'presentation'}[k];
+    if(!col){ // pdf / doc / other → hỏi
+      const choice=await askDocType(f.name);
+      if(choice===null){continue} // người dùng huỷ file này
+      col=choice; // 'ifu' | 'brochure' | 'presentation'
+    }
+    plan.push({file:f,col});
+  }
+  if(!plan.length){return}
+
+  const updates={};
   let done=0;
   try{
-    for(const f of files){
+    for(const item of plan){
       done++;
-      showUploading(`Đang tải lên ${done}/${files.length}…`,f.name);
-      const r=await uploadOne(f,p.name);
-      // ưu tiên kind backend trả về, fallback đoán từ file
-      const k=r.kind||fileKind(f);
-      const col={image:'image',video:'video',pdf:'ifu',presentation:'presentation',doc:'ifu',other:'ifu'}[k]||'ifu';
-      (updates[col]=updates[col]||[]).push(r.url);
+      showUploading(`Đang tải lên ${done}/${plan.length}…`,item.file.name);
+      const r=await uploadOne(item.file,p.name);
+      (updates[item.col]=updates[item.col]||[]).push(r.url);
     }
     showUploading('Đang lưu vào Sheet…','');
     const data={...p};delete data._row;
@@ -951,18 +1113,43 @@ async function handleFiles(files){
     const res=await jsonp({action:'update',payload:JSON.stringify({_row:_currentRow,data})});
     if(!res||!res.ok)throw new Error(res&&res.error||'Lỗi ghi Sheet');
     hideUploading();
-    toast(`Đã thêm ${files.length} file`);
+    toast(`Đã thêm ${plan.length} file`);
     await loadData(false);
     openDetail(_currentRow);
   }catch(err){
     hideUploading();
     const msg=String(err.message||err);
     if(/CHƯA CẤP QUYỀN|DriveApp|permission|quyền/i.test(msg)){
-      toast('Backend chưa được cấp quyền Drive — xem hướng dẫn cấp quyền trong Code.gs (chạy hàm setup)',true);
+      toast('Backend chưa được cấp quyền Drive — chạy hàm setup trong Code.gs rồi Deploy lại',true);
+    }else if(/Failed to fetch|NetworkError|payload|size|too large/i.test(msg)){
+      toast('Upload thất bại — file có thể quá lớn (Apps Script giới hạn ~50MB). Với video nặng nên up lên YouTube/Drive rồi dán link.',true);
     }else{
       toast('Lỗi upload: '+msg,true);
     }
   }
+}
+// Dialog nhỏ chọn loại tài liệu khi kéo PDF/doc vào
+function askDocType(filename){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');
+    ov.className='doctype-overlay';
+    ov.innerHTML=`<div class="doctype-box">
+      <div class="dt-head"><div class="dt-ic">${ICONS.pdf}</div><div><b>Phân loại tài liệu</b><small>${esc(filename)}</small></div></div>
+      <div class="dt-q">Tài liệu này thuộc loại nào?</div>
+      <div class="dt-opts">
+        <button class="dt-opt" data-v="ifu">${ICONS.pdf}<span>IFU<br><i>Hướng dẫn sử dụng</i></span></button>
+        <button class="dt-opt" data-v="brochure">${ICONS.pdf}<span>Brochure<br><i>Catalogue / tờ rơi</i></span></button>
+        <button class="dt-opt" data-v="presentation">${ICONS.ppt}<span>Slide<br><i>Bài trình bày</i></span></button>
+      </div>
+      <button class="dt-cancel">Bỏ qua file này</button>
+    </div>`;
+    document.body.appendChild(ov);
+    requestAnimationFrame(()=>ov.classList.add('show'));
+    function close(val){ov.classList.remove('show');setTimeout(()=>ov.remove(),200);resolve(val)}
+    ov.querySelectorAll('.dt-opt').forEach(b=>b.onclick=()=>close(b.getAttribute('data-v')));
+    ov.querySelector('.dt-cancel').onclick=()=>close(null);
+    ov.onclick=e=>{if(e.target===ov)close(null)};
+  });
 }
 function fileToBase64(f){
   return new Promise((res,rej)=>{
