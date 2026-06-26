@@ -167,30 +167,27 @@ img{max-width:100%;display:block}
 .pcard:hover{box-shadow:var(--shadow-xl);border-color:transparent}
 .pcard .stage{
   position:relative;height:230px;overflow:hidden;
-  background:
-    radial-gradient(120% 80% at 50% 0%,#fff,transparent 70%),
-    linear-gradient(150deg,var(--lb),#dbe9f7 55%,#cdddf0);
+  background:radial-gradient(120% 85% at 50% 0%,#ffffff,#fbfdff 50%,#f2f7fc);
   display:grid;place-items:center;perspective:1100px;
 }
-.pcard .stage::after{content:'';position:absolute;left:14%;right:14%;bottom:18px;height:24px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,48,71,.18),transparent 70%);filter:blur(6px);transition:.5s}
-.pcard:hover .stage::after{bottom:12px;left:20%;right:20%}
+.pcard .stage::after{content:'';position:absolute;left:18%;right:18%;bottom:18px;height:22px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,40,70,.16),transparent 72%);filter:blur(6px);transition:.5s}
+.pcard:hover .stage::after{bottom:13px;left:24%;right:24%}
 .pcard .obj{
-  width:78%;height:78%;display:grid;place-items:center;transform-style:preserve-3d;
-  transition:transform .2s var(--ease);will-change:transform;
+  width:80%;height:80%;display:grid;place-items:center;
+  transition:transform .2s var(--ease);will-change:transform;position:relative;
 }
-.pcard .obj img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,48,71,.22));transition:.5s}
-.pcard:hover .obj img{filter:drop-shadow(0 26px 42px rgba(0,48,71,.32))}
-.pcard .obj .glare{position:absolute;inset:0;opacity:0;pointer-events:none;mix-blend-mode:soft-light;transition:opacity .25s;border-radius:14px}
+.pcard .obj img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 14px 22px rgba(0,40,70,.18));transition:.4s}
+.pcard:hover .obj img{filter:drop-shadow(0 20px 30px rgba(0,40,70,.26))}
 .pcard .obj .ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--blue);opacity:.4}
 .pcard .obj .ph svg{width:46px;height:46px}
 .pcard .obj .ph span{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .pcard .gtag{position:absolute;top:14px;left:14px;z-index:3;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.4px;padding:5px 12px;border-radius:30px}
 .pcard .card360{position:absolute;bottom:14px;left:14px;z-index:3;display:flex;align-items:center;gap:5px;background:rgba(255,225,0,.95);color:var(--navy);font-size:10.5px;font-weight:800;letter-spacing:.4px;padding:5px 11px;border-radius:30px;box-shadow:0 3px 10px rgba(0,48,71,.2)}
 .pcard .card360 svg{width:12px;height:12px}
-.pcard .cardseq{position:relative;width:100%;height:100%}
-.pcard .cardseq .cseq{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease}
-.pcard .cardseq .cseq.show{opacity:1}
-.pcard .obj img.imgerr{opacity:.15}
+/* ảnh card lỗi → ẩn hẳn, hiện placeholder sạch (không text thừa chồng lên) */
+.pcard .obj:has(img.imgerr) img{display:none}
+.pcard .obj:has(img.imgerr) .card360{display:none}
+.pcard .obj:has(img.imgerr)::after{content:'';position:absolute;inset:0;background:var(--lb) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" stroke="%23a9bdd6" stroke-width="1.5"><rect x="6" y="9" width="32" height="26" rx="3"/><circle cx="16" cy="18" r="3"/><path d="M6 30l9-8 7 6 6-5 8 7"/></svg>') center/44px no-repeat;opacity:.7}
 .pcard .chips-media{position:absolute;top:13px;right:13px;z-index:3;display:flex;gap:6px}
 .pcard .mchip{width:27px;height:27px;border-radius:9px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.14)}
 .pcard .mchip svg{width:14px;height:14px}
@@ -238,12 +235,19 @@ img{max-width:100%;display:block}
 .modal-viewer .drag-cue{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(0,48,71,.78);backdrop-filter:blur(6px);color:#fff;font-size:11.5px;font-weight:600;padding:7px 15px;border-radius:30px;pointer-events:none;opacity:.92}
 .modal-viewer .drag-cue svg{width:14px!important;height:14px!important;flex-shrink:0}
 .modal-viewer img.imgerr{opacity:0}
-.modal-viewer .spinwrap:has(img.imgerr)::after,.modal-viewer .spinwrap.allerr::after{content:'Ảnh chưa tải được — kiểm tra quyền chia sẻ Drive';position:absolute;inset:0;display:grid;place-items:center;color:rgba(58,92,170,.6);font-size:12px;font-weight:600;text-align:center;padding:30px}
+.modal-viewer .spinwrap:has(img.imgerr)::after,.modal-viewer .spinwrap.allerr::after{content:'Ảnh chưa hiển thị được — kiểm tra quyền chia sẻ Drive (Bất kỳ ai có link)';position:absolute;inset:0;display:grid;place-items:center;color:#8aa0bd;font-size:12.5px;font-weight:600;text-align:center;padding:40px;line-height:1.5;z-index:2}
 .mimg.imgerr{min-height:200px;position:relative}
 .mcard:has(.mimg.imgerr) .mimg{background:#0c1a2c}
 .modal-viewer .drag-cue svg{width:14px;height:14px}
 .modal-viewer .spin360-badge{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:7px;background:rgba(0,48,71,.82);backdrop-filter:blur(6px);color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;padding:6px 13px;border-radius:30px;pointer-events:none}
 .modal-viewer .spin360-badge svg{width:13px;height:13px;color:var(--yellow)}
+/* khi viewer lỗi ảnh → ẩn mọi overlay thừa, chỉ còn 1 thông báo sạch */
+.modal-viewer:has(img.imgerr) .spin360-badge,
+.modal-viewer:has(img.imgerr) .drag-cue,
+.modal-viewer:has(img.imgerr) .seqbar,
+.modal-viewer:has(.spinwrap.allerr) .spin360-badge,
+.modal-viewer:has(.spinwrap.allerr) .drag-cue,
+.modal-viewer:has(.spinwrap.allerr) .seqbar{display:none}
 .modal-viewer .seq-img{position:absolute;max-width:92%;max-height:320px;object-fit:contain;filter:drop-shadow(0 18px 26px rgba(0,40,70,.22));opacity:0;transition:opacity .05s;pointer-events:none;user-select:none}
 .modal-viewer .seq-img.show{opacity:1}
 .modal-viewer .seqbar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:60%;max-width:240px;height:4px;background:rgba(0,48,71,.15);border-radius:4px;overflow:hidden;pointer-events:none}
@@ -869,11 +873,9 @@ function renderGrid(){
   g.innerHTML=list.map(p=>{
     const imgs=splitImages(p.image);
     let obj;
-    if(imgs.length>=2){
-      // nhiều ảnh → mini sequence tự chuyển ngay trên card
-      obj=`<div class="cardseq" data-frames="${imgs.length}">${imgs.map((u,i)=>`<img class="cseq${i===0?' show':''}" data-src="${esc(u)}" data-try="0" src="${esc(u)}" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)">`).join('')}</div><div class="glare"></div><div class="card360">${ICONS.rotate} 360°</div>`;
-    }else if(imgs.length===1){
-      obj=`<img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)"><div class="glare"></div>`;
+    if(imgs.length>=1){
+      // chỉ hiện ẢNH ĐẦU tĩnh (không tự xoay trên card → tránh nhấp nháy ở danh sách)
+      obj=`<img src="${esc(imgs[0])}" data-src="${esc(imgs[0])}" data-try="0" alt="${esc(p.name)}" loading="lazy" onerror="seqImgRetry(this)">${imgs.length>=2?`<div class="card360">${ICONS.rotate} ${imgs.length} góc</div>`:''}`;
     }else{
       obj=`<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
     }
@@ -889,21 +891,7 @@ function renderGrid(){
     </div>`;
   }).join('');
   attachTilts();
-  startCardSeq();
   revealCards();
-}
-// mini auto-rotate cho card có nhiều ảnh
-let _cardTimers=[];
-function startCardSeq(){
-  _cardTimers.forEach(t=>clearInterval(t));_cardTimers=[];
-  document.querySelectorAll('.cardseq').forEach(box=>{
-    const imgs=[...box.querySelectorAll('.cseq')];const n=imgs.length;if(n<2)return;
-    let f=0;
-    const t=setInterval(()=>{
-      f=(f+1)%n;imgs.forEach((im,i)=>im.classList.toggle('show',i===f));
-    },1100); // card xoay chậm hơn modal
-    _cardTimers.push(t);
-  });
 }
 function renderSkeleton(){
   document.getElementById('grid').innerHTML=Array(6).fill(0).map(()=>`<div class="skel"><div class="si"></div><div class="sb"><div class="sl" style="width:65%"></div><div class="sl" style="width:45%"></div><div class="sl" style="width:88%;height:34px;margin-top:6px"></div></div></div>`).join('');
@@ -1263,7 +1251,7 @@ function openDetail(row){
   if(multi){
     viewer=`<div class="spin360-badge">${ICONS.rotate} 360° · ${imgs.length} góc</div>
       <div class="spinwrap" id="spinwrap" data-mode="seq">${imgs.map((u,i)=>`<img class="seq-img${i===0?' show':''}" data-i="${i}" data-src="${esc(u)}" data-try="0" src="${esc(u)}" alt="" onerror="seqImgRetry(this)">`).join('')}</div>
-      <div class="reflect"></div><div class="seqbar"><div class="fill" id="seqfill"></div></div>
+      <div class="seqbar"><div class="fill" id="seqfill"></div></div>
       <div class="drag-cue">${ICONS.drag} Tự xoay · kéo để điều khiển</div>
       <div class="dz-mini" onclick="pickFiles(event)">${ICONS.upload} Thêm media</div>`;
   }else if(imgs.length===1){
@@ -1328,7 +1316,12 @@ function seqImgRetry(img){
   const src=img.getAttribute('data-src'); let t=parseInt(img.getAttribute('data-try')||'0',10);
   if(t>=3){img.classList.add('imgerr');return}
   img.setAttribute('data-try',t+1);
-  img.src=imgAltUrl(src,t);
+  // preload URL thay thế ngầm; chỉ gán khi tải xong để KHÔNG gây nháy
+  const next=imgAltUrl(src,t);
+  const probe=new Image();
+  probe.onload=()=>{ img.src=next; img.classList.remove('imgerr'); };
+  probe.onerror=()=>{ seqImgRetry(img); }; // thử URL kế tiếp, vẫn ngầm
+  probe.src=next;
 }
 function initSeq360(n){
   const w=document.getElementById('spinwrap');if(!w)return;
