@@ -362,7 +362,10 @@ img{max-width:100%;display:block}
 .mbtn-lg:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 6px 16px rgba(224,123,57,.4)}
 .mbtn-lg svg{width:14px;height:14px}
 .ppt-card .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c;overflow:hidden}
+.ppt-card .ppt-frame-wrap.is-ppt-file{aspect-ratio:auto;height:78vh;min-height:520px}
 .ppt-card .ppt-frame-wrap .mframe.ppt{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-height:0!important}
+.slide-hint{display:flex;align-items:center;gap:8px;padding:11px 16px;font-size:12.5px;font-weight:600;color:var(--blue);background:#fafcff;border-top:1px solid var(--line)}
+.slide-hint svg{width:14px;height:14px;color:var(--green);flex-shrink:0}
 .mvideo{width:100%;max-height:72vh;background:#000;display:block;aspect-ratio:16/9}
 .vid-note{display:flex;align-items:flex-start;gap:8px;padding:11px 16px;font-size:12px;color:var(--muted);background:#fafcff;border-top:1px solid var(--line);line-height:1.45}
 .vid-note svg{width:15px;height:15px;color:var(--blue);flex-shrink:0;margin-top:1px}
@@ -1003,22 +1006,27 @@ function videoFallback(v){
 function oneSlideHTML(url,idx,total){
   const id=driveId(url);
   const isGS=/\/presentation\/d\//.test(url);
+  const isPPT=/rtpof=true/.test(url) || /\.pptx?(\?|$)/i.test(url); // file PowerPoint upload lên Drive
   const label= total>1 ? `Slide ${idx+1}/${total}` : 'Slide trình bày';
   if(isGS&&id){
-    // embed CHUẨN của Google Slides: có sẵn thanh ◀ ▶ ở dưới + tự chạy 5s/slide.
-    // KHÔNG dùng rm=minimal (sẽ mất thanh điều khiển). start=true để tự chạy ngay.
+    // /embed autoplay CHỈ hoạt động với Google Slides GỐC.
+    // File .pptx upload (rtpof=true) sẽ ra Drive PDF-viewer (Trang x/y) — không autoplay được.
     const embed=`https://docs.google.com/presentation/d/${id}/embed?start=true&loop=true&delayms=5000`;
     const present=`https://docs.google.com/presentation/d/${id}/present`;
+    const note = isPPT
+      ? `<div class="vid-note">${ICONS.info} Đây là file <b>PowerPoint</b> nên không tự chạy được. Để slide <b>tự chạy</b> & lật từng trang: mở file → <b>File ▸ Lưu dưới dạng Google Trang trình bày</b>, rồi dán link Google Slides mới vào ô Slide. Hoặc bấm <b>Trình chiếu</b> để xem toàn màn hình.`
+      : `<div class="slide-hint">${ICONS.play} Tự chạy 5s/slide · dùng thanh ◀ ▶ ở mép dưới khung để tự lật</div>`;
     return `<div class="mcard ppt-card">
       <div class="mch">
         <div class="mci ppt">${ICONS.ppt}</div>
-        <div class="mct"><b>${esc(label)}</b><small>Tự chạy 5s/slide · thanh ◀ ▶ ở mép dưới khung để tự lật</small></div>
+        <div class="mct"><b>${esc(label)}</b><small>${isPPT?'File PowerPoint (xem từng trang)':'Google Slides — tự chạy'}</small></div>
         <div class="mca">
-          <a class="mbtn-lg" href="${present}" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play}<span>Toàn màn hình</span></a>
-          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở Google Slides">${ICONS.ext}</a>
+          <a class="mbtn-lg" href="${present}" target="_blank" title="Trình chiếu toàn màn hình">${ICONS.play}<span>Trình chiếu</span></a>
+          <a class="mbtn" href="https://docs.google.com/presentation/d/${id}/edit" target="_blank" title="Mở trong Google">${ICONS.ext}</a>
         </div>
       </div>
-      <div class="ppt-frame-wrap"><iframe class="mframe ppt" data-slide data-embed="${esc(embed)}" src="${esc(embed)}" allow="autoplay" allowfullscreen loading="lazy" frameborder="0"></iframe></div>
+      <div class="ppt-frame-wrap${isPPT?' is-ppt-file':''}"><iframe class="mframe ppt" ${isPPT?'':'data-slide'} data-embed="${esc(embed)}" src="${esc(embed)}" allow="autoplay" allowfullscreen loading="lazy" frameborder="0"></iframe></div>
+      ${note}
     </div>`;
   }
   return mediaItemHTML(label,url,'presentation');
@@ -1551,7 +1559,7 @@ function openEdit(row){
       <div class="fgl">Media & Tài liệu (dán link Google Drive)</div>
       <div class="field"><label>Ảnh <span class="opt">— dán 1 link, hoặc nhiều link (cách nhau bằng dấu phẩy / xuống dòng) để bật xoay 360°</span></label><textarea id="f_image" rows="2" placeholder="https://drive.google.com/file/d/.../view&#10;https://drive.google.com/file/d/.../view  ← thêm để xoay 360°">${esc(p.image)}</textarea></div>
       <div class="field"><label>Video <span class="opt">— 1 hoặc nhiều link (mỗi dòng 1 link). YouTube / Vimeo / Drive</span></label><textarea id="f_video" rows="2" placeholder="https://youtu.be/...&#10;https://drive.google.com/file/d/.../view">${esc(p.video)}</textarea></div>
-      <div class="field"><label>Slide trình bày <span class="opt">— 1 hoặc nhiều link Google Slides (mỗi dòng 1)</span></label><textarea id="f_presentation" rows="2" placeholder="https://docs.google.com/presentation/d/.../edit">${esc(p.presentation)}</textarea></div>
+      <div class="field"><label>Slide trình bày <span class="opt">— link Google Slides để TỰ CHẠY (File ▸ Lưu dưới dạng Google Trang trình bày nếu đang là PPT). Nhiều link: mỗi dòng 1</span></label><textarea id="f_presentation" rows="2" placeholder="https://docs.google.com/presentation/d/.../edit">${esc(p.presentation)}</textarea></div>
       <div class="field"><label>IFU <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_ifu" rows="2">${esc(p.ifu)}</textarea></div>
       <div class="field"><label>Brochure <span class="opt">— có thể nhiều file (mỗi dòng 1 link)</span></label><textarea id="f_brochure" rows="2">${esc(p.brochure)}</textarea></div>
     </div>
