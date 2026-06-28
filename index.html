@@ -254,15 +254,17 @@ img{max-width:100%;display:block}
 .pane.active{display:block;animation:paneIn .4s var(--ease)}
 @keyframes paneIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* doc-type sub navigation inside a main doc tab */
-.doctab-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed var(--line)}
-.doctab{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:#5a708a;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s var(--ease)}
-.doctab svg{width:15px;height:15px}
+/* doc-type sub navigation inside a main doc tab — cuộn ngang 1 hàng, không wrap */
+.doctab-wrap{position:relative;margin-bottom:18px;padding-bottom:16px;border-bottom:1px dashed var(--line)}
+.doctab-bar{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:2px}
+.doctab-bar::-webkit-scrollbar{height:5px}.doctab-bar::-webkit-scrollbar-thumb{background:var(--lb);border-radius:5px}.doctab-bar::-webkit-scrollbar-track{background:transparent}
+.doctab{display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:12px;border:1.5px solid var(--line);background:#fff;color:#5a708a;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.2s var(--ease);white-space:nowrap;flex-shrink:0;scroll-snap-align:start}
+.doctab svg{width:15px;height:15px;flex-shrink:0}
 .doctab:hover{border-color:var(--blue);color:var(--navy);transform:translateY(-1px)}
-.doctab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.doctab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 4px 12px rgba(0,48,71,.22)}
 .doctab .b{font-size:10.5px;font-weight:800;background:var(--blue);color:#fff;border-radius:20px;padding:1px 7px;min-width:18px;text-align:center}
 .doctab.active .b{background:var(--yellow);color:var(--navy)}
-.doctab.empty-dt{opacity:.55}
+.doctab.empty-dt{opacity:.5}
 .doctab .b.zero{background:#dfe6f0;color:#8a99ad}
 .docpane{display:none}
 .docpane.active{display:block;animation:fadeMedia .35s var(--ease)}
@@ -326,6 +328,7 @@ img{max-width:100%;display:block}
 
 /* media cards */
 .mediagrid{display:grid;gap:18px}
+.media-stack{display:flex;flex-direction:column;gap:18px}
 .mcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-sm);background:#fff}
 .mcard .mch{display:flex;align-items:center;gap:13px;padding:14px 18px;background:linear-gradient(90deg,#fafcff,#fff);border-bottom:1px solid var(--line)}
 .mcard .mci{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;box-shadow:var(--shadow-sm)}
@@ -343,12 +346,27 @@ img{max-width:100%;display:block}
 .mframe{width:100%;background:var(--bg);border:0;display:block}
 .mframe.pdf,.mframe.doc{height:72vh;min-height:520px}
 .mframe.vid{aspect-ratio:16/9;height:auto}
+/* lazy doc placeholder — chỉ nạp iframe khi bấm, tránh tải nhiều iframe cùng lúc */
+.lazydoc{position:relative;width:100%;background:linear-gradient(135deg,#0c1a2c,#102b45);min-height:300px;display:grid;place-items:center;cursor:pointer;overflow:hidden}
+.lazydoc .ld-inner{text-align:center;color:#cfe0f2;padding:30px 20px;z-index:1}
+.lazydoc .ld-ic{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;margin:0 auto 14px;background:rgba(255,255,255,.1);backdrop-filter:blur(6px)}
+.lazydoc .ld-ic svg{width:30px;height:30px;color:#fff}
+.lazydoc.pdf .ld-ic{background:rgba(192,57,43,.85)}.lazydoc.ppt .ld-ic{background:rgba(224,123,57,.9)}.lazydoc.doc .ld-ic{background:rgba(29,78,216,.85)}.lazydoc.sheet .ld-ic{background:rgba(15,138,79,.85)}
+.lazydoc .ld-t{font-size:14.5px;font-weight:800;color:#fff;margin-bottom:5px}
+.lazydoc .ld-s{font-size:12px;opacity:.75}
+.lazydoc .ld-play{display:inline-flex;align-items:center;gap:8px;margin-top:15px;background:#fff;color:var(--navy);font-weight:800;font-size:12.5px;padding:9px 17px;border-radius:30px;transition:.2s}
+.lazydoc:hover .ld-play{transform:scale(1.04)}
+.lazydoc .ld-play svg{width:13px;height:13px}
+.lazydoc .ld-glow{position:absolute;width:320px;height:320px;border-radius:50%;filter:blur(70px);opacity:.4;top:-100px;right:-90px;background:radial-gradient(circle,var(--blue),transparent 70%)}
+/* nút mở fullscreen ở header media card (hữu ích trên mobile) */
+.mbtn.full:hover{border-color:var(--navy);color:var(--navy);background:var(--pale)}
 .mbtn-lg{display:flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:11px;background:var(--orange);color:#fff;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s var(--ease);white-space:nowrap}
 .mbtn-lg:hover{filter:brightness(1.06);transform:translateY(-1px)}
 .mbtn-lg svg{width:14px;height:14px}
 .ppt-frame-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#0c1a2c;overflow:hidden}
 .ppt-frame-wrap.is-ppt-file{aspect-ratio:auto;height:74vh;min-height:520px}
 .ppt-frame-wrap .mframe.ppt{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-height:0!important}
+.mframe.ppt-fill{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-height:0!important}
 .slide-hint{display:flex;align-items:center;gap:8px;padding:11px 16px;font-size:12.5px;font-weight:600;color:var(--blue);background:#fafcff;border-top:1px solid var(--line)}
 .slide-hint svg{width:14px;height:14px;color:var(--green);flex-shrink:0}
 .vid-note{display:flex;align-items:flex-start;gap:8px;padding:11px 16px;font-size:12px;color:var(--muted);background:#fafcff;border-top:1px solid var(--line);line-height:1.45}
@@ -367,7 +385,7 @@ img{max-width:100%;display:block}
 .doctype-box .dt-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}
 .doctype-box .dt-ic{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex-shrink:0}
 .doctype-box .dt-ic svg{width:22px;height:22px;color:#fff}
-.doctype-box .dt-ic.pdf{background:#c0392b}.doctype-box .dt-ic.move{background:var(--orange)}
+.doctype-box .dt-ic.pdf{background:#c0392b}.doctype-box .dt-ic.move{background:var(--orange)}.doctype-box .dt-ic.danger{background:#e05858}
 .doctype-box .dt-head b{font-size:16px;color:var(--navy);display:block}
 .doctype-box .dt-head small{font-size:12px;color:var(--muted);word-break:break-all;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .doctype-box .dt-q{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:14px}
@@ -381,6 +399,11 @@ img{max-width:100%;display:block}
 .doctype-box .dt-opt .dt-ot i{font-style:normal;font-weight:500;font-size:11.5px;color:var(--muted);display:block;margin-top:1px}
 .doctype-box .dt-cancel{width:100%;padding:11px;border-radius:12px;border:none;background:var(--bg);color:var(--muted);font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.2s;margin-top:14px}
 .doctype-box .dt-cancel:hover{background:#e9eef6;color:var(--ink)}
+.doctype-box .confirm-row{display:flex;gap:10px}
+.doctype-box .cf-btn{flex:1;padding:13px;border-radius:13px;border:none;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;transition:.2s var(--ease)}
+.doctype-box .cf-btn.ghost{background:var(--bg);color:var(--muted)}.doctype-box .cf-btn.ghost:hover{background:#e9eef6;color:var(--ink)}
+.doctype-box .cf-btn.primary{background:var(--navy);color:#fff}.doctype-box .cf-btn.primary:hover{background:var(--blue)}
+.doctype-box .cf-btn.danger{background:#e05858;color:#fff}.doctype-box .cf-btn.danger:hover{background:#c0392b}
 
 /* edit form */
 .field{margin-bottom:18px}
@@ -437,13 +460,31 @@ img{max-width:100%;display:block}
   .modal-detail{padding:22px 18px 18px}.modal-detail h2{font-size:20px}.modal-close{top:12px;right:12px;width:38px;height:38px}.modal-edit{top:12px;right:58px;height:38px;padding:0 13px;font-size:12.5px}
   .tabs{position:sticky;top:0;z-index:9;padding:4px 14px 0;gap:2px}.tab{padding:14px 11px 13px;font-size:13.5px;flex-shrink:0}
   .mbody{padding:18px 14px 40px;max-height:none;overflow:visible}
-  .doctab-bar{gap:7px}.doctab{padding:8px 12px;font-size:12.5px}
-  .mframe.pdf,.mframe.doc{height:62vh;min-height:380px}.gallery .swiper{height:300px}.mimg{max-height:380px}
+  .doctab-wrap{padding-bottom:14px;margin-bottom:16px}.doctab{padding:9px 13px;font-size:12.5px}
+  .mframe.pdf,.mframe.doc{height:56vh;min-height:340px}.ppt-frame-wrap.is-ppt-file{height:auto;aspect-ratio:16/9;min-height:0}.gallery .swiper{height:260px}.mimg{max-height:340px}
+  .lazydoc{min-height:230px}.lazydoc .ld-inner{padding:24px 16px}.lazydoc .ld-ic{width:54px;height:54px}
   .mcard .mch{flex-wrap:wrap;gap:10px}.mcard .mca{width:100%}
+  .story-nav{gap:8px}.sn-arrow,.sn-play{width:42px;height:42px}.story-dot span{display:none}
+  .slide-card .sc-head{padding:16px 16px;gap:12px}.slide-card .sc-head h3{font-size:16.5px}.slide-card .sc-ic{width:40px;height:40px}.slide-card .sc-body{padding:18px 16px}.slide-card .sc-count{font-size:18px}
+  .ch-narrative p{font-size:14.5px}.ch-usp{font-size:15px}
   #editModal{max-width:100%}.frow{flex-direction:column;gap:0}.mfoot{padding:14px 18px;flex-direction:column-reverse}.mfoot .btn{width:100%;justify-content:center}
   .doctype-box{max-width:100%;border-radius:18px;padding:20px}
   .foot .wrap{flex-direction:column;align-items:flex-start;gap:18px}.foot .fmeta{text-align:left}
   .toast{bottom:16px;left:16px;right:16px;transform:translateY(90px);max-width:none}.toast.show{transform:translateY(0)}
+}
+@media(min-width:1400px){
+  .modal{max-width:1280px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+}
+@media(max-width:400px){
+  .nav .brand b{font-size:12.5px}.hero h1{font-size:30px}
+  .lineseg button{padding:7px 12px;font-size:12px}
+  .tab{padding:13px 9px;font-size:12.5px}
+  .doctab{padding:8px 11px;font-size:12px}
+  .mcard .mch{padding:12px 14px}.mcard .mci{width:34px;height:34px}
+  .mframe.pdf,.mframe.doc{height:50vh;min-height:300px}
+  .modal-detail h2{font-size:18px}
+  .dt-opt .dt-ot{font-size:13px}
 }
 @media(hover:none){.pcard:hover{transform:none}.pcard .obj{transform:none!important}}
 </style>
@@ -796,7 +837,6 @@ function renderGrid(){
   const g=document.getElementById('grid');
   if(!list.length){g.innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><p>Không tìm thấy sản phẩm nào.</p></div>`;return}
   g.innerHTML=list.map(p=>{
-    const line=p.line||lineOf(p.category);
     const imgs=splitImages(p.rawPhoto);
     let obj;
     if(imgs.length>=1){
@@ -804,10 +844,8 @@ function renderGrid(){
     }else{
       obj=`<div class="ph">${ICONS.photo}<span>Chưa có ảnh</span></div>`;
     }
-    const lbCls=line==='Dental'?'':line;
     return `<div class="pcard" onclick="openDetail(${p._row})">
-      <div class="stage"><div class="obj" data-tilt>${obj}</div>
-        <div class="gtag"><span class="lbadge ${lbCls}">${esc(line)}</span> ${esc(p.group)}</div>${mediaChips(p)}</div>
+      <div class="stage"><div class="obj" data-tilt>${obj}</div>${mediaChips(p)}</div>
       <div class="info">
         <div class="pname">${esc(p.name)}</div>
         <div class="ptype">${esc(p.type)}</div>
@@ -882,65 +920,102 @@ function initStoryCarousel(){
   const total=+car.getAttribute('data-total');
   const track=car.querySelector('.story-track'),slides=[...car.querySelectorAll('.story-slide')],dots=[...car.querySelectorAll('.story-dot')];
   const fill=car.querySelector('.sp-fill'),playBtn=car.querySelector('.sn-play');
-  let cur=0,playing=true,AUTO=5000,t0=0,raf=null;
+  let cur=0,playing=true,AUTO=8500,t0=0,raf=null,hovering=false;
   function render(){slides.forEach((s,i)=>s.classList.toggle('active',i===cur));dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
     const ac=slides[cur].firstElementChild,ah=ac?ac.offsetHeight:0;track.style.height=ah>0?ah+'px':'auto';}
   function go(i,manual){cur=(i%total+total)%total;render();if(manual)restart()}
   function next(){go(cur+1)}
-  function loop(){if(!playing)return;const el=Math.min(1,(Date.now()-t0)/AUTO);if(fill)fill.style.width=(el*100)+'%';if(el>=1){next();t0=Date.now()}raf=requestAnimationFrame(loop)}
+  function loop(){if(!playing){raf=requestAnimationFrame(loop);return}if(hovering){t0=Date.now()-0;raf=requestAnimationFrame(loop);return}const el=Math.min(1,(Date.now()-t0)/AUTO);if(fill)fill.style.width=(el*100)+'%';if(el>=1){next();t0=Date.now()}raf=requestAnimationFrame(loop)}
   function restart(){t0=Date.now();if(fill)fill.style.width='0%'}
   function play(){playing=true;playBtn.innerHTML=ICONS.pause;restart();cancelAnimationFrame(raf);loop()}
   function pause(){playing=false;playBtn.innerHTML=ICONS.play;cancelAnimationFrame(raf)}
   car.querySelectorAll('.sn-arrow').forEach(b=>b.onclick=()=>go(cur+(+b.getAttribute('data-dir')),true));
   dots.forEach(d=>d.onclick=()=>go(+d.getAttribute('data-go'),true));
   playBtn.onclick=()=>{playing?pause():play()};
+  // tạm dừng đếm giờ khi đang đọc (hover desktop / chạm mobile) → không tự nhảy giữa chừng
+  track.addEventListener('mouseenter',()=>{hovering=true;if(fill)fill.style.opacity='.4'});
+  track.addEventListener('mouseleave',()=>{hovering=false;t0=Date.now();if(fill)fill.style.opacity='1'});
   let sx=0,sw=false;
-  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sw=true},{passive:true});
-  track.addEventListener('touchend',e=>{if(!sw)return;sw=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(cur+(dx<0?1:-1),true)});
+  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sw=true;hovering=true},{passive:true});
+  track.addEventListener('touchend',e=>{if(!sw){hovering=false;return}sw=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(cur+(dx<0?1:-1),true);setTimeout(()=>{hovering=false;t0=Date.now()},2500)});
   render();setTimeout(render,80);play();
   _storyCtl={pause,play,stop:()=>{playing=false;cancelAnimationFrame(raf)},render};
   window.addEventListener('resize',render);
 }
 
-/* ====== MEDIA CARD (with view / open / download / move / delete) ====== */
+/* ====== MEDIA CARD (with view / open / download / move / delete) ======
+   Tối ưu: chỉ ảnh + video YouTube render iframe ngay (nhẹ).
+   PDF / slide / doc / sheet → placeholder, BẤM mới nạp iframe → tránh
+   tải nhiều iframe Google Drive cùng lúc khi mở 1 sản phẩm nhiều tài liệu. */
 function mediaCardHTML(name,url,docCol,idx){
   const kind=detectKind(url,docCol);
   const icoClass={pdf:'pdf',image:'img',video:'vid',presentation:'ppt',doc:'doc',sheet:'sheet',link:'link'}[kind]||'link';
   const ico={pdf:ICONS.pdf,image:ICONS.photo,video:ICONS.vid,presentation:ICONS.ppt,doc:ICONS.pdf,sheet:ICONS.pdf,link:ICONS.ext}[kind]||ICONS.ext;
   const kLabel={pdf:'PDF',image:'Hình ảnh',video:'Video',presentation:'Slide',doc:'Tài liệu',sheet:'Bảng tính',link:'Liên kết'}[kind];
   const disp = name || cleanFileName(url) || kLabel;
-  let viewer='';
+  let viewer='', embedSrc='', frameCls='';
   if(kind==='image'){
     viewer=`<img class="mimg" src="${esc(imgUrl(url))}" data-src="${esc(url)}" data-try="0" onclick="openLightbox('${esc(imgUrl(url))}')" onerror="seqImgRetry(this)">`;
-  }else if(kind==='video'){
-    if(isYouTube(url)){const b=ytEmbed(url);const sep=b.includes('?')?'&':'?';
-      viewer=`<iframe class="mframe vid" data-ytauto src="${esc(b+sep+'rel=0&playsinline=1')}" data-embed="${esc(b+sep+'autoplay=1&mute=1&rel=0&playsinline=1')}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
-    }else if(isVimeo(url)){const b=vimeoEmbed(url);
-      viewer=`<iframe class="mframe vid" src="${esc(b)}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
-    }else{const id=driveId(url);
-      viewer=`<iframe class="mframe vid" src="${esc('https://drive.google.com/file/d/'+id+'/preview')}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;}
-  }else if(kind==='presentation'){
-    const id=driveId(url);
-    if(id){const embed=`https://docs.google.com/presentation/d/${id}/embed?start=true&loop=true&delayms=5000`;
-      viewer=`<div class="ppt-frame-wrap"><iframe class="mframe ppt" src="${esc(embed)}" allow="autoplay" allowfullscreen loading="lazy" frameborder="0"></iframe></div>`;
-    }else viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết slide — mở tab mới.</p></div>`;
+  }else if(kind==='video' && isYouTube(url)){
+    // YouTube nhẹ, nhúng luôn (nhưng không autoplay tới khi tab/pane active)
+    const b=ytEmbed(url);const sep=b.includes('?')?'&':'?';
+    viewer=`<iframe class="mframe vid" data-ytauto src="${esc(b+sep+'rel=0&playsinline=1')}" data-embed="${esc(b+sep+'autoplay=1&mute=1&rel=0&playsinline=1')}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
   }else if(kind==='link'){
     viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết ngoài — mở tab mới để xem.</p></div>`;
   }else{
-    const cls=(kind==='doc'||kind==='sheet')?'doc':'pdf';
-    viewer=`<iframe class="mframe ${cls}" src="${esc(embedUrl(url,kind))}" allow="fullscreen" allowfullscreen loading="lazy"></iframe>`;
+    // video-Drive/Vimeo, presentation, pdf, doc, sheet → lazy
+    if(kind==='video'){
+      embedSrc = isVimeo(url)?vimeoEmbed(url):('https://drive.google.com/file/d/'+driveId(url)+'/preview');
+      frameCls='mframe vid';
+    }else if(kind==='presentation'){
+      const id=driveId(url);
+      if(id){ embedSrc=`https://docs.google.com/presentation/d/${id}/embed?start=false&rm=minimal`; frameCls='mframe ppt ppt-fill'; }
+      else { embedSrc=''; }
+    }else{
+      embedSrc=embedUrl(url,kind);
+      frameCls=(kind==='doc'||kind==='sheet')?'mframe doc':'mframe pdf';
+    }
+    if(embedSrc){
+      const ldCls={pdf:'pdf',presentation:'ppt',doc:'doc',sheet:'sheet',video:'vid'}[kind]||'pdf';
+      const verb={pdf:'Xem PDF',presentation:'Xem slide',doc:'Xem tài liệu',sheet:'Xem bảng tính',video:'Phát video'}[kind]||'Xem';
+      viewer=`<div class="lazydoc ${ldCls}" data-embed="${esc(embedSrc)}" data-fcls="${esc(frameCls)}" onclick="loadLazyDoc(this)">
+        <div class="ld-glow"></div>
+        <div class="ld-inner">
+          <div class="ld-ic">${ico}</div>
+          <div class="ld-t">${esc(disp)}</div>
+          <div class="ld-s">${kLabel} · bấm để xem ngay tại đây</div>
+          <span class="ld-play">${ICONS.play} ${verb}</span>
+        </div></div>`;
+    }else{
+      viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết — mở tab mới để xem.</p></div>`;
+    }
   }
   return `<div class="mcard">
     <div class="mch">
       <div class="mci ${icoClass}">${ico}</div>
       <div class="mct"><b>${esc(disp)}</b><small>${kLabel} · ${esc(docLabel(docCol))}</small></div>
       <div class="mca">
-        <a class="mbtn" href="${esc(openUrl(url))}" target="_blank" title="Mở tab mới">${ICONS.ext}</a>
+        <a class="mbtn full" href="${esc(openUrl(url))}" target="_blank" title="Mở toàn màn hình / tab mới">${ICONS.ext}</a>
         <a class="mbtn" href="${esc(dlUrl(url))}" target="_blank" title="Tải về">${ICONS.dl}</a>
         <button class="mbtn move" title="Chuyển sang folder khác" onclick="askMoveTarget('${docCol}',${idx})">${ICONS.move}</button>
         <button class="mbtn del" title="Xoá tài liệu này" onclick="removeLink('${docCol}',${idx})">${ICONS.trash}</button>
       </div>
     </div>${viewer}</div>`;
+}
+// Nạp iframe khi người dùng bấm vào placeholder (giải phóng tải đồng thời)
+function loadLazyDoc(el){
+  const src=el.getAttribute('data-embed'), fcls=el.getAttribute('data-fcls')||'mframe pdf';
+  if(!src)return;
+  const isPpt=fcls.indexOf('ppt')>=0;
+  const wrap=document.createElement(isPpt?'div':'span');
+  if(isPpt){
+    wrap.className='ppt-frame-wrap';
+    wrap.innerHTML=`<iframe class="${esc(fcls)}" src="${esc(src)}" allow="autoplay;fullscreen" allowfullscreen frameborder="0"></iframe>`;
+  }else{
+    wrap.style.display='block';
+    wrap.innerHTML=`<iframe class="${esc(fcls)}" src="${esc(src)}" allow="autoplay;fullscreen" allowfullscreen frameborder="0"></iframe>`;
+  }
+  el.replaceWith(isPpt?wrap:wrap.firstElementChild);
 }
 
 /* ====== DOC TAB (Marketing / Technical / Presentation) ======
@@ -968,16 +1043,18 @@ function docTabHTML(p,tab){
     }
     return `<div class="docpane ${i===firstActive?'active':''}" data-dt="${d.key}">${body}</div>`;
   }).join('');
-  return `<div class="doctab-bar">${navHTML}</div><div class="docpanes">${panes}</div>`;
+  return `<div class="doctab-wrap"><div class="doctab-bar">${navHTML}</div></div><div class="docpanes">${panes}</div>`;
 }
 function switchDocType(btn,tab,key){
   const pane=btn.closest('.pane');
   pane.querySelectorAll('.doctab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // cuộn nút active vào giữa tầm nhìn (mobile)
+  try{btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})}catch(e){}
   pane.querySelectorAll('.docpane').forEach(p=>p.classList.remove('active'));
   const dp=pane.querySelector(`.docpane[data-dt="${key}"]`);if(dp)dp.classList.add('active');
-  // kích hoạt autoplay slide nếu có
-  if(dp) dp.querySelectorAll('iframe[data-ytauto]').forEach(f=>{const e=f.getAttribute('data-embed');if(e)f.src=e;});
+  // kích hoạt autoplay video YouTube nếu có
+  if(dp) dp.querySelectorAll('iframe[data-ytauto]').forEach(f=>{const e=f.getAttribute('data-embed');if(e&&f.src!==e)f.src=e;});
 }
 
 /* ====== 360 / SINGLE IMAGE VIEWER ====== */
@@ -1269,11 +1346,33 @@ async function doMove(fromCol,idx,toCol){
     await loadData(false);openDetail(_currentRow);
   }catch(err){hideOverlayBusy();toast('Lỗi chuyển folder: '+(err.message||err),true)}
 }
-// Xoá 1 tài liệu (gỡ link khỏi Sheet + tuỳ chọn xoá file Drive)
+// Hộp xác nhận đẹp (thay confirm() gốc — xấu & phá nhịp trên mobile)
+function confirmDialog({title,message,confirmText='Xác nhận',cancelText='Huỷ',danger=false}){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');ov.className='doctype-overlay';
+    ov.innerHTML=`<div class="doctype-box">
+      <div class="dt-head"><div class="dt-ic ${danger?'danger':'pdf'}">${danger?ICONS.trash:ICONS.info}</div><div><b>${esc(title)}</b></div></div>
+      <div class="dt-q" style="margin-bottom:18px">${esc(message)}</div>
+      <div class="confirm-row">
+        <button class="cf-btn ghost">${esc(cancelText)}</button>
+        <button class="cf-btn ${danger?'danger':'primary'}">${esc(confirmText)}</button>
+      </div></div>`;
+    document.body.appendChild(ov);requestAnimationFrame(()=>ov.classList.add('show'));
+    function close(v){ov.classList.remove('show');setTimeout(()=>ov.remove(),200);resolve(v)}
+    const btns=ov.querySelectorAll('.cf-btn');
+    btns[0].onclick=()=>close(false);btns[1].onclick=()=>close(true);
+    ov.onclick=e=>{if(e.target===ov)close(false)};
+  });
+}
+// Xoá 1 tài liệu (gỡ link khỏi Sheet + chuyển file Drive vào thùng rác)
 async function removeLink(col,idx){
   const p=PRODUCTS.find(x=>x._row===_currentRow);if(!p)return;
   const items=splitMedia(p[col]);const item=items[idx];if(!item)return;
-  if(!confirm(`Xoá tài liệu "${item.name||cleanFileName(item.url)}" khỏi ${docLabel(col)}?\n\n(File trên Drive cũng sẽ được chuyển vào thùng rác.)`))return;
+  const ok=await confirmDialog({
+    title:'Xoá tài liệu',
+    message:`Xoá "${item.name||cleanFileName(item.url)}" khỏi ${docLabel(col)}? File trên Drive cũng sẽ được chuyển vào thùng rác.`,
+    confirmText:'Xoá',danger:true});
+  if(!ok)return;
   showOverlayBusy('Đang xoá…',item.name||cleanFileName(item.url));
   try{
     if(USE_LIVE){
@@ -1284,7 +1383,7 @@ async function removeLink(col,idx){
       if(!res||!res.ok)throw new Error(res&&res.error||'Lỗi ghi Sheet');
       hideOverlayBusy();toast('Đã xoá tài liệu');
       await loadData(false);openDetail(_currentRow);
-    }
+    }else{toast('Cần kết nối Sheet để xoá',true);hideOverlayBusy();}
   }catch(err){hideOverlayBusy();toast('Lỗi xoá: '+(err.message||err),true)}
 }
 function showOverlayBusy(msg,sub){
