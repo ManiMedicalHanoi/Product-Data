@@ -920,75 +920,58 @@ function initStoryCarousel(){
   const total=+car.getAttribute('data-total');
   const track=car.querySelector('.story-track'),slides=[...car.querySelectorAll('.story-slide')],dots=[...car.querySelectorAll('.story-dot')];
   const fill=car.querySelector('.sp-fill'),playBtn=car.querySelector('.sn-play');
-  let cur=0,playing=true,AUTO=8500,t0=0,raf=null,hovering=false;
+  let cur=0,playing=true,AUTO=7000,t0=0,raf=null;
   function render(){slides.forEach((s,i)=>s.classList.toggle('active',i===cur));dots.forEach((d,i)=>d.classList.toggle('active',i===cur));
     const ac=slides[cur].firstElementChild,ah=ac?ac.offsetHeight:0;track.style.height=ah>0?ah+'px':'auto';}
   function go(i,manual){cur=(i%total+total)%total;render();if(manual)restart()}
   function next(){go(cur+1)}
-  function loop(){if(!playing){raf=requestAnimationFrame(loop);return}if(hovering){t0=Date.now()-0;raf=requestAnimationFrame(loop);return}const el=Math.min(1,(Date.now()-t0)/AUTO);if(fill)fill.style.width=(el*100)+'%';if(el>=1){next();t0=Date.now()}raf=requestAnimationFrame(loop)}
+  function loop(){if(!playing){raf=requestAnimationFrame(loop);return}const el=Math.min(1,(Date.now()-t0)/AUTO);if(fill)fill.style.width=(el*100)+'%';if(el>=1){next();t0=Date.now()}raf=requestAnimationFrame(loop)}
   function restart(){t0=Date.now();if(fill)fill.style.width='0%'}
   function play(){playing=true;playBtn.innerHTML=ICONS.pause;restart();cancelAnimationFrame(raf);loop()}
   function pause(){playing=false;playBtn.innerHTML=ICONS.play;cancelAnimationFrame(raf)}
   car.querySelectorAll('.sn-arrow').forEach(b=>b.onclick=()=>go(cur+(+b.getAttribute('data-dir')),true));
   dots.forEach(d=>d.onclick=()=>go(+d.getAttribute('data-go'),true));
   playBtn.onclick=()=>{playing?pause():play()};
-  // tạm dừng đếm giờ khi đang đọc (hover desktop / chạm mobile) → không tự nhảy giữa chừng
-  track.addEventListener('mouseenter',()=>{hovering=true;if(fill)fill.style.opacity='.4'});
-  track.addEventListener('mouseleave',()=>{hovering=false;t0=Date.now();if(fill)fill.style.opacity='1'});
   let sx=0,sw=false;
-  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sw=true;hovering=true},{passive:true});
-  track.addEventListener('touchend',e=>{if(!sw){hovering=false;return}sw=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(cur+(dx<0?1:-1),true);setTimeout(()=>{hovering=false;t0=Date.now()},2500)});
+  track.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sw=true},{passive:true});
+  track.addEventListener('touchend',e=>{if(!sw)return;sw=false;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>45)go(cur+(dx<0?1:-1),true)});
   render();setTimeout(render,80);play();
   _storyCtl={pause,play,stop:()=>{playing=false;cancelAnimationFrame(raf)},render};
   window.addEventListener('resize',render);
 }
 
 /* ====== MEDIA CARD (with view / open / download / move / delete) ======
-   Tối ưu: chỉ ảnh + video YouTube render iframe ngay (nhẹ).
-   PDF / slide / doc / sheet → placeholder, BẤM mới nạp iframe → tránh
-   tải nhiều iframe Google Drive cùng lúc khi mở 1 sản phẩm nhiều tài liệu. */
+   Mở sẵn iframe trực tiếp — không phải bấm. Dùng loading="lazy" của trình
+   duyệt để iframe chỉ thực sự tải khi cuộn tới gần, vẫn nhẹ máy.
+   Slide Google tự chạy 9 giây/trang. */
 function mediaCardHTML(name,url,docCol,idx){
   const kind=detectKind(url,docCol);
   const icoClass={pdf:'pdf',image:'img',video:'vid',presentation:'ppt',doc:'doc',sheet:'sheet',link:'link'}[kind]||'link';
   const ico={pdf:ICONS.pdf,image:ICONS.photo,video:ICONS.vid,presentation:ICONS.ppt,doc:ICONS.pdf,sheet:ICONS.pdf,link:ICONS.ext}[kind]||ICONS.ext;
   const kLabel={pdf:'PDF',image:'Hình ảnh',video:'Video',presentation:'Slide',doc:'Tài liệu',sheet:'Bảng tính',link:'Liên kết'}[kind];
   const disp = name || cleanFileName(url) || kLabel;
-  let viewer='', embedSrc='', frameCls='';
+  let viewer='';
   if(kind==='image'){
     viewer=`<img class="mimg" src="${esc(imgUrl(url))}" data-src="${esc(url)}" data-try="0" onclick="openLightbox('${esc(imgUrl(url))}')" onerror="seqImgRetry(this)">`;
   }else if(kind==='video' && isYouTube(url)){
-    // YouTube nhẹ, nhúng luôn (nhưng không autoplay tới khi tab/pane active)
     const b=ytEmbed(url);const sep=b.includes('?')?'&':'?';
     viewer=`<iframe class="mframe vid" data-ytauto src="${esc(b+sep+'rel=0&playsinline=1')}" data-embed="${esc(b+sep+'autoplay=1&mute=1&rel=0&playsinline=1')}" allow="autoplay;encrypted-media;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+  }else if(kind==='video'){
+    const src = isVimeo(url)?vimeoEmbed(url):('https://drive.google.com/file/d/'+driveId(url)+'/preview');
+    viewer=`<iframe class="mframe vid" src="${esc(src)}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
+  }else if(kind==='presentation'){
+    const id=driveId(url);
+    if(id){
+      // tự chạy slide, 9 giây/trang
+      const embed=`https://docs.google.com/presentation/d/${id}/embed?start=true&loop=true&delayms=9000&rm=minimal`;
+      viewer=`<div class="ppt-frame-wrap"><iframe class="mframe ppt ppt-fill" src="${esc(embed)}" allow="autoplay;fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe></div>`;
+    }else viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết slide — mở tab mới để xem.</p></div>`;
   }else if(kind==='link'){
     viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết ngoài — mở tab mới để xem.</p></div>`;
   }else{
-    // video-Drive/Vimeo, presentation, pdf, doc, sheet → lazy
-    if(kind==='video'){
-      embedSrc = isVimeo(url)?vimeoEmbed(url):('https://drive.google.com/file/d/'+driveId(url)+'/preview');
-      frameCls='mframe vid';
-    }else if(kind==='presentation'){
-      const id=driveId(url);
-      if(id){ embedSrc=`https://docs.google.com/presentation/d/${id}/embed?start=false&rm=minimal`; frameCls='mframe ppt ppt-fill'; }
-      else { embedSrc=''; }
-    }else{
-      embedSrc=embedUrl(url,kind);
-      frameCls=(kind==='doc'||kind==='sheet')?'mframe doc':'mframe pdf';
-    }
-    if(embedSrc){
-      const ldCls={pdf:'pdf',presentation:'ppt',doc:'doc',sheet:'sheet',video:'vid'}[kind]||'pdf';
-      const verb={pdf:'Xem PDF',presentation:'Xem slide',doc:'Xem tài liệu',sheet:'Xem bảng tính',video:'Phát video'}[kind]||'Xem';
-      viewer=`<div class="lazydoc ${ldCls}" data-embed="${esc(embedSrc)}" data-fcls="${esc(frameCls)}" onclick="loadLazyDoc(this)">
-        <div class="ld-glow"></div>
-        <div class="ld-inner">
-          <div class="ld-ic">${ico}</div>
-          <div class="ld-t">${esc(disp)}</div>
-          <div class="ld-s">${kLabel} · bấm để xem ngay tại đây</div>
-          <span class="ld-play">${ICONS.play} ${verb}</span>
-        </div></div>`;
-    }else{
-      viewer=`<div class="nomedia">${ICONS.ext}<p>Liên kết — mở tab mới để xem.</p></div>`;
-    }
+    // pdf / doc / sheet → nhúng sẵn
+    const cls=(kind==='doc'||kind==='sheet')?'mframe doc':'mframe pdf';
+    viewer=`<iframe class="${cls}" src="${esc(embedUrl(url,kind))}" allow="fullscreen" allowfullscreen loading="lazy" frameborder="0"></iframe>`;
   }
   return `<div class="mcard">
     <div class="mch">
@@ -1001,21 +984,6 @@ function mediaCardHTML(name,url,docCol,idx){
         <button class="mbtn del" title="Xoá tài liệu này" onclick="removeLink('${docCol}',${idx})">${ICONS.trash}</button>
       </div>
     </div>${viewer}</div>`;
-}
-// Nạp iframe khi người dùng bấm vào placeholder (giải phóng tải đồng thời)
-function loadLazyDoc(el){
-  const src=el.getAttribute('data-embed'), fcls=el.getAttribute('data-fcls')||'mframe pdf';
-  if(!src)return;
-  const isPpt=fcls.indexOf('ppt')>=0;
-  const wrap=document.createElement(isPpt?'div':'span');
-  if(isPpt){
-    wrap.className='ppt-frame-wrap';
-    wrap.innerHTML=`<iframe class="${esc(fcls)}" src="${esc(src)}" allow="autoplay;fullscreen" allowfullscreen frameborder="0"></iframe>`;
-  }else{
-    wrap.style.display='block';
-    wrap.innerHTML=`<iframe class="${esc(fcls)}" src="${esc(src)}" allow="autoplay;fullscreen" allowfullscreen frameborder="0"></iframe>`;
-  }
-  el.replaceWith(isPpt?wrap:wrap.firstElementChild);
 }
 
 /* ====== DOC TAB (Marketing / Technical / Presentation) ======
